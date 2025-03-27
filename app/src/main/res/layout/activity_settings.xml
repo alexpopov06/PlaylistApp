@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:padding="@dimen/s8"
+    android:paddingLeft="@dimen/s12"
+    android:paddingTop="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
     <LinearLayout
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:text="@string/set"
             android:textColor="@color/black"
-            android:textSize="26sp"
+            android:textSize="22sp"
             android:layout_marginStart="0dp" />
     </LinearLayout>
 
@@ -46,7 +47,8 @@
             android:layout_height="wrap_content"
             android:text="@string/them"
             android:textColor="@color/black"
-            android:textSize="19sp"
+            android:textSize="@dimen/s16"
+            android:layout_marginStart="16dp"
             android:layout_gravity="center_vertical"/>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
@@ -54,10 +56,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="220dp"
-            android:minWidth="100dp"
-            android:minHeight="100dp"
-            android:padding="@dimen/s16"
+            android:layout_marginEnd="6dp"
+            android:minWidth="56dp"
+            android:minHeight="56dp"
             app:thumbTint="@drawable/switch_thumb_color"
             app:trackTint="@drawable/switch_track_color"
             tools:ignore="TouchTargetSizeCheck" />
@@ -68,64 +69,85 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="@dimen/s32">
+        android:layout_marginTop="@dimen/s21">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/share"
             android:textColor="@color/black"
-            android:textSize="19sp"/>
+            android:layout_marginStart="16dp"
+            android:textSize="@dimen/s16"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="80dp"
+            android:layout_marginEnd="12dp"
             android:background="@android:color/transparent"
             app:icon="@drawable/share"
             app:iconTint="@color/grey"
-            app:iconSize="@dimen/s32"/>
+            app:iconSize="@dimen/s24"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="@dimen/s32">
+        android:layout_marginTop="@dimen/s21">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/write"
             android:textColor="@color/black"
-            android:textSize="19sp"/>
+            android:layout_marginStart="16dp"
+            android:textSize="@dimen/s16"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="120dp"
+            android:layout_marginEnd="12dp"
             android:background="@android:color/transparent"
             app:icon="@drawable/support"
             app:iconTint="@color/grey"
-            app:iconSize="@dimen/s32" />
+            app:iconSize="@dimen/s24"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="@dimen/s32">
+        android:layout_marginTop="@dimen/s21">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sogl"
             android:textColor="@color/black"
-            android:textSize="19sp"/>
+            android:layout_marginStart="16dp"
+            android:textSize="@dimen/s16"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
+            android:layout_marginEnd="12dp"
             android:background="@android:color/transparent"
             app:icon="@drawable/arrow"
             app:iconTint="@color/grey"
-            app:iconSize="@dimen/s32" />
+            app:iconSize="@dimen/s32"/>
     </LinearLayout>
 
 </LinearLayout>
