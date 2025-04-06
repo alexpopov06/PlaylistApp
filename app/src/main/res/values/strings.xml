@@ -10,7 +10,8 @@
     <string name="LinkAndroid">https://practicum.yandex.ru/profile/android-developer/</string>
     <string name="MessageToDev">Сообщение разработчикам и разработчицам приложения Playlist Maker/</string>
     <string name="ThanksToDev">«Спасибо разработчикам и разработчицам за крутое приложение!»/</string>
-    <string name="AndoidOffer">https://yandex.ru/legal/practicum_offer//</string>
+    <string name="AndoidOffer">https://yandex.ru/legal/practicum_offer/</string>
     <string name="input_hint">Поиск</string>
+    <string name="myEmail">Alexpopov06@mail.ru</string>
 
 </resources>

@@ -1,9 +1,12 @@
 package com.practicum.playlistapp
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +25,10 @@ class Search : AppCompatActivity() {
         setContentView(R.layout.activity_search)
         val inputEditText = findViewById<EditText>(R.id.inputText)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
+        val back = findViewById<Button>(R.id.button_back)
+        back.setOnClickListener {
+            finish()
+        }
         if (savedInstanceState != null) {
             searchText = savedInstanceState.getString(SEARCH_TEXT_KEY, "")
             inputEditText.setText(searchText)
@@ -53,6 +60,8 @@ class Search : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         searchText = savedInstanceState.getString(SEARCH_TEXT_KEY, "")
         inputEditText?.setText(searchText)
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(inputEditText?.windowToken, 0)
     }
 
 
@@ -63,4 +72,5 @@ class Search : AppCompatActivity() {
             View.VISIBLE
         }
     }
+
 }
