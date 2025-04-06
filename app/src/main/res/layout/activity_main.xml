@@ -3,7 +3,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue"
+    android:background="@color/FonMain"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="@dimen/s16">
@@ -11,6 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/ys_display_medium"
         android:text="@string/app_name"
         android:textColor="@color/white"
         android:textSize="@dimen/s24" />
@@ -23,59 +24,24 @@
         android:layout_weight="1">
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:id="@+id/pos1"
-            android:backgroundTint="@color/white"
             android:text="@string/search"
-            android:textSize="24sp"
-            android:textColor="@color/black"
-            android:layout_marginBottom="@dimen/s8"
-            android:layout_marginStart="@dimen/s8"
-            android:layout_marginEnd="@dimen/s8"
+            android:fontFamily="@font/ys_display_medium"
             app:icon="@drawable/lup"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/s8"
-            app:iconSize="@dimen/s24"
-            app:iconTint="@color/black"
-            app:cornerRadius="@dimen/s16"/>
+            android:id="@+id/pos1"
+            style="@style/Button"/>
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:backgroundTint="@color/white"
-            android:layout_weight="1"
-            android:id="@+id/pos2"
             android:text="@string/med"
-            android:textSize="24sp"
-            android:textColor="@color/black"
-            android:layout_marginBottom="@dimen/s8"
-            android:layout_marginStart="@dimen/s8"
-            android:layout_marginEnd="@dimen/s8"
+            android:fontFamily="@font/ys_display_medium"
             app:icon="@drawable/med"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/s8"
-            app:iconSize="@dimen/s24"
-            app:iconTint="@color/black"
-            app:cornerRadius="@dimen/s16"/>
+            android:id="@+id/pos2"
+            style="@style/Button" />
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
-            android:id="@+id/pos3"
             android:text="@string/set"
-            android:textSize="@dimen/s24"
-            android:textColor="@color/black"
-            android:layout_marginStart="@dimen/s8"
-            android:layout_marginEnd="@dimen/s8"
+            android:fontFamily="@font/ys_display_medium"
             app:icon="@drawable/setting"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/s8"
-            app:iconSize="@dimen/s24"
-            app:iconTint="@color/black"
-            app:cornerRadius="@dimen/s16"/>
+            android:id="@+id/pos3"
+            style="@style/Button"/>
     </LinearLayout>
 </LinearLayout>

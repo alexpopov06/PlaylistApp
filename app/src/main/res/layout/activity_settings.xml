@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/FonSet"
     android:paddingLeft="@dimen/s12"
     android:paddingTop="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -22,33 +22,28 @@
             app:icon="@drawable/back"
             app:iconGravity="textStart"
             app:iconPadding="@dimen/s8"
-            app:iconSize="32dp"
-            app:iconTint="@color/black"
+            app:iconSize="24dp"
+            app:iconTint="@color/colorOnSurface"
 
             />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/TextCondition"
             android:text="@string/set"
-            android:textColor="@color/black"
+            android:fontFamily="@font/ys_display_medium"
             android:textSize="22sp"
             android:layout_marginStart="0dp" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        style="@style/LinerSet"
         android:layout_marginTop="@dimen/s32">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/TextCondition"
             android:text="@string/them"
-            android:textColor="@color/black"
             android:textSize="@dimen/s16"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/s16"
             android:layout_gravity="center_vertical"/>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
@@ -66,17 +61,13 @@
 
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        style="@style/LinerSet"
         android:layout_marginTop="@dimen/s21">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/TextCondition"
             android:text="@string/share"
-            android:textColor="@color/black"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/s16"
             android:textSize="@dimen/s16"/>
 
         <View
@@ -85,26 +76,18 @@
             android:layout_weight="1"/>
 
         <Button
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:background="@android:color/transparent"
             app:icon="@drawable/share"
-            app:iconTint="@color/grey"
-            app:iconSize="@dimen/s24"/>
+            android:id="@+id/share"
+            style="@style/ButtonsSet"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        style="@style/LinerSet"
         android:layout_marginTop="@dimen/s21">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/TextCondition"
             android:text="@string/write"
-            android:textColor="@color/black"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/s16"
             android:textSize="@dimen/s16"/>
 
         <View
@@ -113,26 +96,18 @@
             android:layout_weight="1"/>
 
         <Button
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:background="@android:color/transparent"
             app:icon="@drawable/support"
-            app:iconTint="@color/grey"
-            app:iconSize="@dimen/s24"/>
+            android:id="@+id/writeSup"
+            style="@style/ButtonsSet"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        style="@style/LinerSet"
         android:layout_marginTop="@dimen/s21">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/TextCondition"
             android:text="@string/sogl"
-            android:textColor="@color/black"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/s16"
             android:textSize="@dimen/s16"/>
 
         <View
@@ -141,12 +116,9 @@
             android:layout_weight="1"/>
 
         <Button
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:background="@android:color/transparent"
             app:icon="@drawable/arrow"
-            app:iconTint="@color/grey"
+            android:id="@+id/agreementButton"
+            style="@style/ButtonsSet"
             app:iconSize="@dimen/s32"/>
     </LinearLayout>
 

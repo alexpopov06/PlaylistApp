@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="FonMain">#1A1B22</color>
+    <color name="FonSet">#1A1B22</color>
+    <color name="colorOnSurface">#FFFFFF</color>
+    <color name="ColorIcons">#FFFFFFFF</color>
+    <color name="KeyBoardCont">#FFFFFF</color>
+    <color name="InputHint">#1A1B22</color>
+    <color name="foneSearch">#1A1B22</color>
+</resources>
