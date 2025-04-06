@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/FonSet"
+    android:paddingLeft="@dimen/s12"
+    android:paddingTop="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="0dp"
+            app:icon="@drawable/back"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/s8"
+            app:iconSize="24dp"
+            app:iconTint="@color/colorOnSurface"
+
+            />
+
+        <TextView
+            style="@style/TextCondition"
+            android:text="@string/set"
+            android:fontFamily="@font/ys_display_medium"
+            android:textSize="22sp"
+            android:layout_marginStart="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/LinerSet"
+        android:layout_marginTop="@dimen/s32">
+
+        <TextView
+            style="@style/TextCondition"
+            android:text="@string/them"
+            android:textSize="@dimen/s16"
+            android:layout_marginStart="@dimen/s16"
+            android:layout_gravity="center_vertical"/>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/my_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="6dp"
+            android:minWidth="56dp"
+            android:minHeight="56dp"
+            app:thumbTint="@drawable/switch_thumb_color"
+            app:trackTint="@drawable/switch_track_color"
+            tools:ignore="TouchTargetSizeCheck" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        style="@style/LinerSet"
+        android:layout_marginTop="@dimen/s21">
+
+        <TextView
+            style="@style/TextCondition"
+            android:text="@string/share"
+            android:layout_marginStart="@dimen/s16"
+            android:textSize="@dimen/s16"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <Button
+            app:icon="@drawable/share"
+            android:id="@+id/share"
+            style="@style/ButtonsSet"/>
+    </LinearLayout>
+    <LinearLayout
+        style="@style/LinerSet"
+        android:layout_marginTop="@dimen/s21">
+
+        <TextView
+            style="@style/TextCondition"
+            android:text="@string/write"
+            android:layout_marginStart="@dimen/s16"
+            android:textSize="@dimen/s16"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <Button
+            app:icon="@drawable/support"
+            android:id="@+id/writeSup"
+            style="@style/ButtonsSet"/>
+    </LinearLayout>
+    <LinearLayout
+        style="@style/LinerSet"
+        android:layout_marginTop="@dimen/s21">
+
+        <TextView
+            style="@style/TextCondition"
+            android:text="@string/sogl"
+            android:layout_marginStart="@dimen/s16"
+            android:textSize="@dimen/s16"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <Button
+            app:icon="@drawable/arrow"
+            android:id="@+id/agreementButton"
+            style="@style/ButtonsSet"
+            app:iconSize="@dimen/s32"/>
+    </LinearLayout>
+
+</LinearLayout>

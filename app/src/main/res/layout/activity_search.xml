@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/foneSearch"
+    android:padding="@dimen/s8">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="@dimen/s12">
+
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="0dp"
+            app:icon="@drawable/back"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/s8"
+            app:iconSize="@dimen/s24"
+            app:iconTint="@color/colorOnSurface"
+
+            />
+
+        <TextView
+            style="@style/TextCondition"
+            android:text="@string/search"
+            android:fontFamily="@font/ys_display_medium"
+            android:textSize="@dimen/s24"
+            android:layout_marginStart="0dp" />
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/s16"
+        android:paddingEnd="@dimen/s16">
+
+        <EditText
+            android:id="@+id/inputText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/edittext_rounded_bg"
+            android:hint="@string/input_hint"
+            android:maxLength="10"
+            android:maxLines="1"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textColorHint="@color/InputHint"
+            android:drawableStart="@drawable/lup"
+            android:drawablePadding="@dimen/s8"
+            android:paddingStart="@dimen/s16"
+            android:drawableTint="@color/InputHint"
+            android:focusable="true"
+            android:focusableInTouchMode="true"/>
+
+        <ImageView
+            android:id="@+id/clearIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:visibility="gone"
+            android:padding="@dimen/s8" />
+    </FrameLayout>
+</LinearLayout>
