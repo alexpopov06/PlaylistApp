@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="11dp"
+            android:layout_marginEnd="18dp"
 
 
             app:thumbTint="@drawable/switch_thumb_color"
@@ -67,13 +67,15 @@
 
     <LinearLayout
         style="@style/LinerSet"
-        android:layout_marginTop="@dimen/s16">
+        android:layout_marginTop="@dimen/s16"
+        android:gravity="center_vertical">
 
         <TextView
             style="@style/TextCondition"
             android:text="@string/share"
             android:layout_marginStart="@dimen/s16"
-            android:textSize="@dimen/s16"/>
+            android:textSize="@dimen/s16"
+            android:layout_gravity="center_vertical"/>
 
         <View
             android:layout_width="0dp"
@@ -83,17 +85,20 @@
         <Button
             app:icon="@drawable/share"
             android:id="@+id/share"
-            style="@style/ButtonsSet"/>
+            style="@style/ButtonsSet"
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
     <LinearLayout
         style="@style/LinerSet"
-        android:layout_marginTop="@dimen/s16">
+        android:layout_marginTop="@dimen/s16"
+        android:gravity="center_vertical">
 
         <TextView
             style="@style/TextCondition"
             android:text="@string/write"
             android:layout_marginStart="@dimen/s16"
-            android:textSize="@dimen/s16"/>
+            android:textSize="@dimen/s16"
+            android:layout_gravity="center_vertical"/>
 
         <View
             android:layout_width="0dp"
@@ -103,17 +108,20 @@
         <Button
             app:icon="@drawable/support"
             android:id="@+id/writeSup"
-            style="@style/ButtonsSet"/>
+            style="@style/ButtonsSet"
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
     <LinearLayout
         style="@style/LinerSet"
-        android:layout_marginTop="@dimen/s16">
+        android:layout_marginTop="@dimen/s16"
+        android:gravity="center_vertical">
 
         <TextView
             style="@style/TextCondition"
             android:text="@string/sogl"
             android:layout_marginStart="@dimen/s16"
-            android:textSize="@dimen/s16"/>
+            android:textSize="@dimen/s16"
+            android:layout_gravity="center_vertical"/>
 
         <View
             android:layout_width="0dp"
@@ -124,7 +132,8 @@
             app:icon="@drawable/arrow"
             android:id="@+id/agreementButton"
             style="@style/ButtonsSet"
-            app:iconSize="@dimen/s32"/>
+            app:iconSize="@dimen/s32"
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
 </LinearLayout>

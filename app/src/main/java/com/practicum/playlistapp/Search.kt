@@ -28,6 +28,7 @@ class Search : AppCompatActivity() {
         val back = findViewById<Button>(R.id.button_back)
         back.setOnClickListener {
             finish()
+
         }
         if (savedInstanceState != null) {
             searchText = savedInstanceState.getString(SEARCH_TEXT_KEY, "")
@@ -35,6 +36,8 @@ class Search : AppCompatActivity() {
         }
         clearButton.setOnClickListener {
             inputEditText.setText("")
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
         }
         val simpleTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

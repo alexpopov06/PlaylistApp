@@ -13,4 +13,5 @@
     <color name="KeyBoardCont">#E6E8EB</color>
     <color name="InputHint">#AEAFB4</color>
     <color name="foneSearch">#FFFFFFFF</color>
+    <color name="gray">#AEAFB4</color>
 </resources>
