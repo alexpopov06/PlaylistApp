@@ -4,12 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/FonSet"
-    android:paddingLeft="@dimen/s12"
     android:paddingTop="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="@dimen/s24"
@@ -20,7 +19,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:layout_marginStart="0dp"
             app:icon="@drawable/back"
             app:iconGravity="start"
             app:iconSize="@dimen/s24"
@@ -41,7 +39,7 @@
 
     <LinearLayout
         style="@style/LinerSet"
-        android:layout_marginTop="@dimen/s32"
+        android:layout_marginTop="@dimen/s16"
         android:gravity="center_vertical">
 
         <TextView

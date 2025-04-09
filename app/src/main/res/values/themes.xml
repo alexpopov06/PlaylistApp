@@ -5,6 +5,7 @@
         <item name="android:windowBackground">@color/FonSet</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
         <item name="ColorIcon">@color/ColorIcons</item>
+        <item name="clearButtonColor">@color/clearButtonColor</item>
     </style>
 
 

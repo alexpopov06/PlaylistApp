@@ -7,4 +7,5 @@
     <color name="KeyBoardCont">#FFFFFF</color>
     <color name="InputHint">#1A1B22</color>
     <color name="foneSearch">#1A1B22</color>
+    <color name="clearButtonColor">#1A1B22</color>
 </resources>

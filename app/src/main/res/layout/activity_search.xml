@@ -57,7 +57,7 @@
             android:textColorHint="@color/InputHint"
             android:drawableStart="@drawable/lup"
             android:drawablePadding="@dimen/s8"
-            android:paddingStart="@dimen/s16"
+            android:paddingStart="@dimen/s12"
             android:drawableTint="@color/InputHint"
             android:focusable="true"
             android:focusableInTouchMode="true"/>
@@ -68,8 +68,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
             android:src="@drawable/clear"
-            android:color="@color/gray"
-
+            android:color="@color/clearButtonColor"
+            android:visibility="visible"
             android:padding="@dimen/s8" />
     </FrameLayout>
 </LinearLayout>
