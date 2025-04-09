@@ -6,4 +6,6 @@
     <dimen name="s24">24dp</dimen>
     <dimen name="s32">32dp</dimen>
     <dimen name="s21">21dp</dimen>
+    <dimen name="s22">22dp</dimen>
+    <dimen name="s14">14dp</dimen>
 </resources>

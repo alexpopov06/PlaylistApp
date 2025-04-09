@@ -1,9 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.PlaylistApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Theme.PlaylistApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:colorBackground">@color/FonMain</item>
+        <item name="android:windowBackground">@color/FonSet</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="ColorIcon">@color/ColorIcons</item>
+        <item name="clearButtonColor">@color/clearButtonColor</item>
     </style>
 
-    <style name="Theme.PlaylistApp" parent="Base.Theme.PlaylistApp" />
+
 </resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Button" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_marginBottom">@dimen/s8</item>
+        <item name="android:layout_marginStart">@dimen/s8</item>
+        <item name="android:layout_marginEnd">@dimen/s8</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/s8</item>
+        <item name="iconSize">@dimen/s24</item>
+        <item name="iconTint">@color/black</item>
+        <item name="cornerRadius">@dimen/s16</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="ButtonsSet">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">18dp</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="iconTint">@color/ColorIcons</item>
+        <item name="iconSize">@dimen/s24</item>
+    </style>
+    <style name="LinerSet">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="TextCondition">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+    <style name="TextCondition2">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">match_parent</item>
+    <item name="android:textColor">?attr/colorOnSurface</item>
+    <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+</resources>
