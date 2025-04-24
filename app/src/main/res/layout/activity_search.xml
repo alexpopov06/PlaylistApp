@@ -69,7 +69,7 @@
             android:layout_gravity="end|center_vertical"
             android:src="@drawable/clear"
             android:color="@color/clearButtonColor"
-            android:visibility="visible"
+            android:visibility="gone"
             android:padding="@dimen/s8" />
     </FrameLayout>
 </LinearLayout>
