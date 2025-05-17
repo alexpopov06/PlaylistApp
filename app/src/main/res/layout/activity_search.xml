@@ -14,7 +14,7 @@
         android:layout_marginBottom="@dimen/s24"
         android:gravity="center_vertical">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -72,4 +72,10 @@
             android:visibility="gone"
             android:padding="@dimen/s8" />
     </FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RecycleTracks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/s24"/>
+
 </LinearLayout>
