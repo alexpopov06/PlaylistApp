@@ -13,10 +13,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 
 class Search : AppCompatActivity() {
     private var searchText: String = ""
     private var inputEditText: EditText? = null
+
+
+
     companion object {
         private const val SEARCH_TEXT_KEY = "search_text_key"
     }
@@ -25,8 +31,9 @@ class Search : AppCompatActivity() {
         setContentView(R.layout.activity_search)
         val inputEditText = findViewById<EditText>(R.id.inputText)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
-        val back = findViewById<Button>(R.id.button_back)
+        val back = findViewById<MaterialButton>(R.id.button_back)
         back.setOnClickListener {
+            println("clicked")
             finish()
 
         }
@@ -54,6 +61,16 @@ class Search : AppCompatActivity() {
             }
         }
         inputEditText.addTextChangedListener(simpleTextWatcher)
+        val tracks = mutableListOf<Track>()
+        tracks.add(Track("Smells Like Teen Spirit", "Nirvana", "5:01", getString(R.string.trackLink1)))
+        tracks.add(Track("Billie Jean", "Michael Jackson", "4:35", getString(R.string.trackLink2)))
+        tracks.add(Track("Stayin' Alive", "Bee Gees", "4:10", getString(R.string.trackLink3)))
+        tracks.add(Track("Whole Lotta Love", "Led Zeppelin", "5:33", getString(R.string.trackLink4)))
+        tracks.add(Track("Sweet Child O'Mine", "Guns N' Roses", "5:03", getString(R.string.trackLink1)))
+        val rvTrack = findViewById<RecyclerView>(R.id.RecycleTracks)
+        val adapter = TrackAdapter(tracks)
+        rvTrack.adapter = adapter
+        rvTrack.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -75,5 +92,6 @@ class Search : AppCompatActivity() {
             View.VISIBLE
         }
     }
+
 
 }

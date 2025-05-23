@@ -8,4 +8,7 @@
     <color name="InputHint">#1A1B22</color>
     <color name="foneSearch">#1A1B22</color>
     <color name="clearButtonColor">#1A1B22</color>
+    <color name="ColorTrackName">#FFFFFF</color>
+    <color name="ColorTrackGroup">#FFFFFF</color>
+
 </resources>
