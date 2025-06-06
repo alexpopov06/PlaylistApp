@@ -45,4 +45,13 @@
     <item name="android:textColor">?attr/colorOnSurface</item>
     <item name="android:fontFamily">@font/ys_display_regular</item>
     </style>
+    <style name="nowifitext">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">19dp</item>
+        <item name="android:textColor">@color/ColorNothingFind</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:visibility">gone</item>
+    </style>
 </resources>

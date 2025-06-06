@@ -10,5 +10,7 @@
     <color name="clearButtonColor">#1A1B22</color>
     <color name="ColorTrackName">#FFFFFF</color>
     <color name="ColorTrackGroup">#FFFFFF</color>
+    <color name="ColorNothingFind">#FFFFFFFF</color>
+    <color name="obnovaColor">#FF000000</color>
 
 </resources>
