@@ -59,10 +59,11 @@
             android:drawablePadding="@dimen/s8"
             android:paddingStart="@dimen/s12"
             android:drawableTint="@color/InputHint"
-            android:focusable="true"
+            android:textCursorDrawable="@color/cursor_blue"
             android:focusableInTouchMode="true"
             android:imeOptions="actionDone"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:focusable="true"/>
 
         <ImageView
             android:id="@+id/clearIcon"
