@@ -75,12 +75,37 @@
             android:visibility="gone"
             android:padding="@dimen/s8" />
     </FrameLayout>
+    <TextView
+        android:id="@+id/historySearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp"
+        android:text="Вы искали"
+        android:textSize="19dp"
+        android:fontFamily="@font/ys_display_medium"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/colorOnSurface"
+        android:visibility="gone"
+        />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RecycleTracks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"
         android:layout_marginTop="@dimen/s24"/>
+    <Button
+        android:id="@+id/clearHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Очистить историю"
+        android:textSize="@dimen/s14"
+        app:cornerRadius="20dp"
+        android:textColor="@color/obnovaColor"
+        android:backgroundTint="@color/ColorNothingFind"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"/>
+
     <ImageView
         android:id="@+id/EmptyImage"
         android:layout_width="wrap_content"

@@ -8,11 +8,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
+
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
         val back = findViewById<Button>(R.id.button_back)
         back.setOnClickListener {
             finish()
@@ -39,6 +42,14 @@ class SettingsActivity : AppCompatActivity() {
             val browse = Intent(Intent.ACTION_VIEW)
             browse.data = Uri.parse(getString(R.string.AndoidOffer))
             startActivity(browse)
+        }
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.my_switch)
+
+        themeSwitcher.isChecked = (application as App).darkTheme
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+
+
         }
 
 
