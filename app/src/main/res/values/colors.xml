@@ -17,5 +17,8 @@
     <color name="gray">#AEAFB4</color>
     <color name="ColorTrackName">#000000</color>
     <color name="ColorTrackGroup">#AEAFB4</color>
+    <color name="ColorNothingFind">#FF000000</color>
+    <color name="obnovaColor">#FFFFFFFF</color>
+    <color name="cursor_blue">#3772E7</color>
 
 </resources>

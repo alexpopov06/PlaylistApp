@@ -59,8 +59,11 @@
             android:drawablePadding="@dimen/s8"
             android:paddingStart="@dimen/s12"
             android:drawableTint="@color/InputHint"
-            android:focusable="true"
-            android:focusableInTouchMode="true"/>
+            android:textCursorDrawable="@color/cursor_blue"
+            android:focusableInTouchMode="true"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:focusable="true"/>
 
         <ImageView
             android:id="@+id/clearIcon"
@@ -76,6 +79,55 @@
         android:id="@+id/RecycleTracks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         android:layout_marginTop="@dimen/s24"/>
+    <ImageView
+        android:id="@+id/EmptyImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/nothingfind"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="102dp"/>
+    <TextView
+        android:id="@+id/EmptyText"
+        android:layout_marginTop="@dimen/s16"
+        android:text="Ничего не нашлось"
+        style="@style/nowifitext"/>
+    <ImageView
+        android:id="@+id/NoWifiImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/nowifi"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="102dp"/>
+    <TextView
+        android:id="@+id/NoWifiText1"
+        android:text="Проблема со связью"
+        android:layout_marginTop="@dimen/s16"
+        style="@style/nowifitext"/>
+    <TextView
+        android:id="@+id/NoWifiText2"
+        android:text="Загрузка не удалась. Проверьте"
+        android:layout_marginTop="@dimen/s16"
+        style="@style/nowifitext"/>
+    <TextView
+        android:id="@+id/NoWifiText3"
+        android:text="подключение к интернету"
+        android:layout_marginTop="4dp"
+        style="@style/nowifitext"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Обновить"
+        android:textSize="@dimen/s14"
+        app:cornerRadius="20dp"
+        android:textColor="@color/obnovaColor"
+        android:backgroundTint="@color/ColorNothingFind"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"/>
 
 </LinearLayout>
