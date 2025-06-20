@@ -234,12 +234,23 @@ class Search : AppCompatActivity() {
         clearHistory.visibility= View.GONE
     }
     private fun showSearchHistory() {
-        youSearch.visibility= View.VISIBLE
-        clearHistory.visibility= View.VISIBLE
         val historyTracks = searchHistory.getHistory()
-        tracks.clear()
-        tracks.addAll(historyTracks)
-        adapter.notifyDataSetChanged()
+        if (historyTracks.isNotEmpty()){
+            youSearch.visibility= View.VISIBLE
+            clearHistory.visibility= View.VISIBLE
+
+            tracks.clear()
+            tracks.addAll(historyTracks)
+            adapter.notifyDataSetChanged()
+        }else{
+            youSearch.visibility= View.GONE
+            clearHistory.visibility= View.GONE
+            val historyTracks = searchHistory.getHistory()
+            tracks.clear()
+            tracks.addAll(historyTracks)
+            adapter.notifyDataSetChanged()
+        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
