@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -38,6 +39,9 @@ class Search : AppCompatActivity() {
     private lateinit var nowifiText3: TextView
     private lateinit var update: MaterialButton
     private lateinit var adapter: TrackAdapter
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var youSearch: TextView
+    private lateinit var clearHistory: Button
     private val tracks = mutableListOf<Track>()
 
     companion object {
@@ -48,11 +52,14 @@ class Search : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+        youSearch = findViewById<TextView>(R.id.historySearch)
+        clearHistory = findViewById<Button>(R.id.clearHistory)
 
         initViews()
         setupAdapter()
         restoreState(savedInstanceState)
         setupListeners()
+
     }
 
     private fun initViews() {
@@ -67,6 +74,20 @@ class Search : AppCompatActivity() {
         nowifiText2 = findViewById(R.id.NoWifiText2)
         nowifiText3 = findViewById(R.id.NoWifiText3)
         update = findViewById(R.id.update)
+        inputEditText?.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && inputEditText?.text?.isEmpty() == true) {
+                showSearchHistory()
+            }
+        }
+        clearHistory.setOnClickListener {
+            tracks.clear()
+            adapter.notifyDataSetChanged()
+            youSearch.visibility = View.GONE
+            clearHistory.visibility = View.GONE
+            searchHistory.clearHistory()
+
+        }
+
 
         back.setOnClickListener { finish() }
 
@@ -77,11 +98,18 @@ class Search : AppCompatActivity() {
             imm.hideSoftInputFromWindow(inputEditText?.windowToken, 0)
             tracks.clear()
             adapter.notifyDataSetChanged()
+            if (inputEditText?.hasFocus() == true) {
+                showSearchHistory()
+            }
+
         }
     }
 
     private fun setupAdapter() {
-        adapter = TrackAdapter(tracks)
+        searchHistory = SearchHistory(
+            getSharedPreferences("SearchHistoryPrefs", MODE_PRIVATE)
+        )
+        adapter = TrackAdapter(tracks, searchHistory)
         rvTrack.adapter = adapter
         rvTrack.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
@@ -100,9 +128,23 @@ class Search : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 findViewById<ImageView>(R.id.clearIcon).visibility =
                     if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                if (!s.isNullOrEmpty()) {
+                    youSearch.visibility = View.GONE
+                    clearHistory.visibility = View.GONE
+                }
             }
             override fun afterTextChanged(s: Editable?) {
                 searchText = s?.toString() ?: ""
+                if (s.isNullOrEmpty()) {
+                    showSearchHistory()
+                }else{
+                    tracks.clear()
+                    adapter.notifyDataSetChanged()
+                    youSearch.visibility = View.GONE
+                    clearHistory.visibility = View.GONE
+
+                }
+
             }
         })
 
@@ -131,6 +173,7 @@ class Search : AppCompatActivity() {
                     if (response.body() != null && response.body()!!.results != null) {
                         tracks.addAll(response.body()!!.results!!)
                     }
+                    NoEmptyList()
                     adapter.notifyDataSetChanged()
 
                     if (tracks.isNotEmpty()) {
@@ -161,6 +204,8 @@ class Search : AppCompatActivity() {
         nowifiText2.visibility = View.GONE
         nowifiText3.visibility = View.GONE
         update.visibility = View.GONE
+        youSearch.visibility= View.GONE
+        clearHistory.visibility= View.GONE
     }
 
     fun NoEmptyList() {
@@ -172,6 +217,8 @@ class Search : AppCompatActivity() {
         nowifiText2.visibility = View.GONE
         nowifiText3.visibility = View.GONE
         update.visibility = View.GONE
+        youSearch.visibility= View.GONE
+        clearHistory.visibility= View.GONE
     }
 
     fun showNoWifi() {
@@ -183,6 +230,27 @@ class Search : AppCompatActivity() {
         nowifiText2.visibility = View.VISIBLE
         nowifiText3.visibility = View.VISIBLE
         update.visibility = View.VISIBLE
+        youSearch.visibility= View.GONE
+        clearHistory.visibility= View.GONE
+    }
+    private fun showSearchHistory() {
+        val historyTracks = searchHistory.getHistory()
+        if (historyTracks.isNotEmpty()){
+            youSearch.visibility= View.VISIBLE
+            clearHistory.visibility= View.VISIBLE
+
+            tracks.clear()
+            tracks.addAll(historyTracks)
+            adapter.notifyDataSetChanged()
+        }else{
+            youSearch.visibility= View.GONE
+            clearHistory.visibility= View.GONE
+            val historyTracks = searchHistory.getHistory()
+            tracks.clear()
+            tracks.addAll(historyTracks)
+            adapter.notifyDataSetChanged()
+        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
