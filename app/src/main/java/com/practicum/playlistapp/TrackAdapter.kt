@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -37,17 +38,22 @@ class TrackAdapter(private val tlist:List<Track>, private val searchHistory: Sea
         private val trackTime: TextView = itemView.findViewById(R.id.trackTime)
         val timeTrack = SimpleDateFormat("mm:ss", Locale.getDefault())
         fun bind(item:Track){
-            Log.d("TrackAdapter", "Loading image from: ${item.artworkUrl100}")
             trackName.text=item.trackName
             groupName.text=item.artistName
             val milliseconds = item.trackTimeMillis.toLong()
-            trackTime.text = timeTrack.format(Date(milliseconds))
+           trackTime.text = timeTrack.format(Date(milliseconds))
             Glide.with(itemView).load(item.artworkUrl100)
                 .centerCrop().transform(RoundedCorners(10))
                 .placeholder(R.drawable.image_track)
                 .into(imageTrack)
             itemView.setOnClickListener {
-                searchHistory.AddTrackToHistory(item)
+                try {
+                    searchHistory.AddTrackToHistory(item)
+                    Search.moveToMediatek(itemView.context, item)
+                } catch (e: Exception) {
+                    Toast.makeText(itemView.context, "Ошибка открытия трека", Toast.LENGTH_SHORT).show()
+                    Log.e("TrackAdapter", "Error opening track", e)
+                }
             }
         }
     }

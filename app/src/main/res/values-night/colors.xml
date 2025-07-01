@@ -12,5 +12,9 @@
     <color name="ColorTrackGroup">#FFFFFF</color>
     <color name="ColorNothingFind">#FFFFFFFF</color>
     <color name="obnovaColor">#FF000000</color>
+    <color name="black_white">#FFFFFF</color>
+    <color name="bottom_text_grey">#AEAFB4</color>
+    <color name="DarkGrey">#1A1B22</color>
+    <color name="whiteе">#FFFFFFFF</color>
 
 </resources>
