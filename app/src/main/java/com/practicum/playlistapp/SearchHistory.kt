@@ -10,9 +10,10 @@ class SearchHistory(val sharedPreferences: SharedPreferences) {
     }
     fun AddTrackToHistory(track: Track){
         val history = getHistory().toMutableList()
-        history.forEach {
-            if (it.trackId == track.trackId){
-                history.remove(it)
+        val iterator = history.iterator()
+        while (iterator.hasNext()) {
+            if (iterator.next().trackId == track.trackId) {
+                iterator.remove()
             }
         }
         history.add(0, track)

@@ -1,6 +1,7 @@
 package com.practicum.playlistapp
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,6 +49,14 @@ class Search : AppCompatActivity() {
     companion object {
         private const val SEARCH_TEXT_KEY = "search_text_key"
         private const val LAST_FAILED_QUERY_KEY = "last_failed_query_key"
+        fun moveToMediatek(context: Context, track: Track) {
+            val intent = Intent(context, MediatekActivity::class.java).apply {
+                val gson = Gson()
+                val trackJson = gson.toJson(track)
+                putExtra("TRACK_EXTRA", trackJson)
+            }
+            context.startActivity(intent)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -252,6 +262,8 @@ class Search : AppCompatActivity() {
         }
 
     }
+
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
