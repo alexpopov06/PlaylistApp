@@ -56,7 +56,7 @@ class MediatekActivity : AppCompatActivity() {
         country.text= track.country
         Glide.with(this)
             .load(track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
-            .placeholder(R.drawable.image_track)
+            .placeholder(R.drawable.placeholdersvg)
             .into(image)
 
     }
