@@ -18,10 +18,10 @@ import java.util.Date
 import java.util.Locale
 import kotlin.Int
 
-class TrackAdapter(private val tlist:List<Track>, private val searchHistory: SearchHistory):RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private val tlist:List<Track>, private val searchHistory: SearchHistory, private val delayDebounce:()-> Boolean):RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
-        return TrackViewHolder(view, searchHistory)
+        return TrackViewHolder(view, searchHistory, delayDebounce)
     }
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tlist[position])
@@ -31,7 +31,7 @@ class TrackAdapter(private val tlist:List<Track>, private val searchHistory: Sea
         return tlist.size
     }
 
-    class TrackViewHolder(itemView: View, private val searchHistory: SearchHistory): RecyclerView.ViewHolder(itemView){
+    class TrackViewHolder(itemView: View, private val searchHistory: SearchHistory,private val delayDebounce:()-> Boolean ): RecyclerView.ViewHolder(itemView){
         private val imageTrack: ImageView = itemView.findViewById(R.id.imageTrack)
         private val trackName: TextView = itemView.findViewById(R.id.nameTrack)
         private val groupName: TextView = itemView.findViewById(R.id.nameGroup)
@@ -48,8 +48,12 @@ class TrackAdapter(private val tlist:List<Track>, private val searchHistory: Sea
                 .into(imageTrack)
             itemView.setOnClickListener {
                 try {
-                    searchHistory.AddTrackToHistory(item)
-                    Search.moveToMediatek(itemView.context, item)
+                    if (delayDebounce()){
+                        searchHistory.AddTrackToHistory(item)
+                        Search.moveToMediatek(itemView.context, item)
+                    }
+
+
                 } catch (e: Exception) {
                     Toast.makeText(itemView.context, "Ошибка открытия трека", Toast.LENGTH_SHORT).show()
                     Log.e("TrackAdapter", "Error opening track", e)

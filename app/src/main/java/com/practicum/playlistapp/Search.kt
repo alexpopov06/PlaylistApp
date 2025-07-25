@@ -3,6 +3,8 @@ package com.practicum.playlistapp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -11,6 +13,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -44,7 +47,12 @@ class Search : AppCompatActivity() {
     private lateinit var searchHistory: SearchHistory
     private lateinit var youSearch: TextView
     private lateinit var clearHistory: Button
+    private lateinit var progBar: ProgressBar
     private val tracks = mutableListOf<Track>()
+    private var isClickable = true
+    private val handler = Handler(Looper.getMainLooper())
+    val CLICK_DEBOUNCE_DELAY = 1000L
+    val SEARCH_DEBOUNCE_DELAY = 2000L
 
     companion object {
         private const val SEARCH_TEXT_KEY = "search_text_key"
@@ -62,17 +70,16 @@ class Search : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        youSearch = findViewById<TextView>(R.id.historySearch)
-        clearHistory = findViewById<Button>(R.id.clearHistory)
+
 
         initViews()
         setupAdapter()
         restoreState(savedInstanceState)
         setupListeners()
-
     }
 
     private fun initViews() {
+        progBar = findViewById<ProgressBar>(R.id.progressBar)
         rvTrack = findViewById(R.id.RecycleTracks)
         inputEditText = findViewById(R.id.inputText)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
@@ -83,6 +90,8 @@ class Search : AppCompatActivity() {
         nowifiText1 = findViewById(R.id.NoWifiText1)
         nowifiText2 = findViewById(R.id.NoWifiText2)
         nowifiText3 = findViewById(R.id.NoWifiText3)
+        youSearch = findViewById<TextView>(R.id.historySearch)
+        clearHistory = findViewById<Button>(R.id.clearHistory)
         update = findViewById(R.id.update)
         inputEditText?.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus && inputEditText?.text?.isEmpty() == true) {
@@ -102,6 +111,7 @@ class Search : AppCompatActivity() {
         back.setOnClickListener { finish() }
 
         clearButton.setOnClickListener {
+            progBar.visibility = View.GONE
             inputEditText?.text?.clear()
             searchText = ""
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -119,7 +129,7 @@ class Search : AppCompatActivity() {
         searchHistory = SearchHistory(
             getSharedPreferences("SearchHistoryPrefs", MODE_PRIVATE)
         )
-        adapter = TrackAdapter(tracks, searchHistory)
+        adapter = TrackAdapter(tracks, searchHistory, ::delayDebounce)
         rvTrack.adapter = adapter
         rvTrack.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
@@ -136,54 +146,74 @@ class Search : AppCompatActivity() {
         inputEditText?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchText = s?.toString() ?: ""
+
+
                 findViewById<ImageView>(R.id.clearIcon).visibility =
                     if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
                 if (!s.isNullOrEmpty()) {
-                    youSearch.visibility = View.GONE
-                    clearHistory.visibility = View.GONE
-                }
-            }
-            override fun afterTextChanged(s: Editable?) {
-                searchText = s?.toString() ?: ""
-                if (s.isNullOrEmpty()) {
-                    showSearchHistory()
-                }else{
+                    searchDebounce(searchText)
                     tracks.clear()
                     adapter.notifyDataSetChanged()
-                    youSearch.visibility = View.GONE
-                    clearHistory.visibility = View.GONE
 
+                }else{
+                    lastFailedSearchQuery = null
+                    hideNoWifi()
+                    showSearchHistory()
                 }
 
+
+            }
+            override fun afterTextChanged(s: Editable?) {
             }
         })
 
         update.setOnClickListener {
             if (lastFailedSearchQuery != null) {
                 performSearch(lastFailedSearchQuery!!)
+            }else{
+                hideNoWifi()
+
             }
         }
 
-        inputEditText?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE && searchText.isNotEmpty()) {
-                performSearch(searchText)
-                true
-            } else {
-                false
-            }
+//        inputEditText?.setOnEditorActionListener { _, actionId, _ ->
+//            if (actionId == EditorInfo.IME_ACTION_DONE && searchText.isNotEmpty()) {
+//                performSearch(searchText)
+//                true
+//            } else {
+//                false
+//            }
+//        }
+    }
+    private var lastRunnable: Runnable? = null
+
+    fun searchDebounce(query: String) {
+        if (lastRunnable != null) {
+            handler.removeCallbacks(lastRunnable!!)
         }
+        lastRunnable = Runnable {
+            performSearch(query)
+        }
+        handler.postDelayed(lastRunnable!!, SEARCH_DEBOUNCE_DELAY)
     }
 
     private fun performSearch(query: String) {
+        progBar.visibility = View.VISIBLE
+        rvTrack.visibility = View.GONE
+        emptyImage.visibility = View.GONE
+        emptyText.visibility = View.GONE
+        hideNoWifi()
         val movieApi = retrofit.create(TrackInterface::class.java)
         movieApi.search(query).enqueue(object : Callback<TracksResponse> {
             override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
                 if (response.code() == 200) {
+                    progBar.visibility = View.GONE
                     tracks.clear()
                     if (response.body() != null && response.body()!!.results != null) {
                         tracks.addAll(response.body()!!.results!!)
                     }
-                    NoEmptyList()
+
                     adapter.notifyDataSetChanged()
 
                     if (tracks.isNotEmpty()) {
@@ -194,11 +224,13 @@ class Search : AppCompatActivity() {
                     lastFailedSearchQuery = null
                 } else {
                     lastFailedSearchQuery = query
+                    progBar.visibility = View.GONE
                     showNoWifi()
                 }
             }
 
             override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+                progBar.visibility = View.GONE
                 lastFailedSearchQuery = query
                 showNoWifi()
             }
@@ -230,6 +262,13 @@ class Search : AppCompatActivity() {
         youSearch.visibility= View.GONE
         clearHistory.visibility= View.GONE
     }
+    private fun hideNoWifi() {
+        nowifiImage.visibility = View.GONE
+        nowifiText1.visibility = View.GONE
+        nowifiText2.visibility = View.GONE
+        nowifiText3.visibility = View.GONE
+        update.visibility = View.GONE
+    }
 
     fun showNoWifi() {
         rvTrack.visibility = View.GONE
@@ -244,22 +283,34 @@ class Search : AppCompatActivity() {
         clearHistory.visibility= View.GONE
     }
     private fun showSearchHistory() {
+        emptyImage.visibility = View.GONE
+        emptyText.visibility = View.GONE
         val historyTracks = searchHistory.getHistory()
         if (historyTracks.isNotEmpty()){
             youSearch.visibility= View.VISIBLE
             clearHistory.visibility= View.VISIBLE
-
             tracks.clear()
             tracks.addAll(historyTracks)
+            rvTrack.visibility = View.VISIBLE
             adapter.notifyDataSetChanged()
         }else{
             youSearch.visibility= View.GONE
             clearHistory.visibility= View.GONE
+            rvTrack.visibility = View.GONE
             val historyTracks = searchHistory.getHistory()
             tracks.clear()
             tracks.addAll(historyTracks)
             adapter.notifyDataSetChanged()
         }
+
+    }
+    fun delayDebounce(): Boolean{
+        val current = isClickable
+        if (isClickable) {
+            isClickable = false
+            handler.postDelayed({ isClickable = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
 
     }
 

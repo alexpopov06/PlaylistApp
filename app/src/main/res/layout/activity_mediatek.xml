@@ -103,10 +103,11 @@
         app:layout_constraintStart_toEndOf="@id/playButton"
         app:srcCompat="@drawable/favbutton"/>
     <TextView
+        android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="0:30"
+        android:text="0:00"
         android:fontFamily="@font/ys_display_medium"
         android:textSize="@dimen/s14"
         android:textColor="@color/black_white"
