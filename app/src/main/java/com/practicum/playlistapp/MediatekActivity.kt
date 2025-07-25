@@ -47,8 +47,19 @@ class MediatekActivity : AppCompatActivity() {
     private var playerState = STATE_DEFAULT
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mediatek)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.med)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                view.paddingLeft,
+                systemBars.top,
+                view.paddingRight,
+                systemBars.bottom
+            )
+            insets
+        }
         initViews()
         back.setOnClickListener {
             finish()
