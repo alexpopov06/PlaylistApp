@@ -8,8 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.RecyclerView
-фффф
+import com.practicum.playlistapp.ui.media.MediatekActivity
+import com.practicum.playlistapp.ui.search.SearchActivity
+
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         val but1 = findViewById<Button>(R.id.pos1)
 
         but1.setOnClickListener {
-            val displayIntent = Intent(this, Search::class.java)
+            val displayIntent = Intent(this, SearchActivity::class.java)
             startActivity(displayIntent)
         }
         val but2 = findViewById<Button>(R.id.pos2)

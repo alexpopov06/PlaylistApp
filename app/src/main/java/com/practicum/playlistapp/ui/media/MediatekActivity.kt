@@ -1,25 +1,18 @@
-package com.practicum.playlistapp
+package com.practicum.playlistapp.ui.media
 
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import com.practicum.playlistapp.R
+import com.practicum.playlistapp.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 
 class MediatekActivity : AppCompatActivity() {
     private lateinit var image: ImageView

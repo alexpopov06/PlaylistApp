@@ -1,7 +1,8 @@
-package com.practicum.playlistapp
+package com.practicum.playlistapp.ui.history
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.practicum.playlistapp.domain.models.Track
 
 class SearchHistory(val sharedPreferences: SharedPreferences) {
     companion object {

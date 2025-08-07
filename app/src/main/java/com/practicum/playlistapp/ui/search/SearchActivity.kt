@@ -1,4 +1,4 @@
-package com.practicum.playlistapp
+package com.practicum.playlistapp.ui.search
 
 import android.content.Context
 import android.content.Intent
@@ -8,28 +8,29 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
+
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
+import com.practicum.playlistapp.ui.media.MediatekActivity
+import com.practicum.playlistapp.R
+import com.practicum.playlistapp.ui.history.SearchHistory
+import com.practicum.playlistapp.domain.models.Track
+import com.practicum.playlistapp.ui.search.TrackAdapter
+import com.practicum.playlistapp.data.network.TrackInterface
+import com.practicum.playlistapp.TracksResponse
+import com.practicum.playlistapp.data.dto.SearchTracksResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class Search : AppCompatActivity() {
+class SearchActivity : AppCompatActivity() {
     private var searchText: String = ""
     private var inputEditText: EditText? = null
     private var lastFailedSearchQuery: String? = null
@@ -219,13 +220,29 @@ class Search : AppCompatActivity() {
         emptyText.visibility = View.GONE
         hideNoWifi()
         val movieApi = retrofit.create(TrackInterface::class.java)
-        movieApi.search(query).enqueue(object : Callback<TracksResponse> {
-            override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
+        movieApi.search(query).enqueue(object : Callback<SearchTracksResponse> {
+            override fun onResponse(call: Call<SearchTracksResponse>, response: Response<SearchTracksResponse>) {
+                progBar.visibility = View.GONE
                 if (response.code() == 200) {
-                    progBar.visibility = View.GONE
                     tracks.clear()
-                    if (response.body() != null && response.body()!!.results != null) {
-                        tracks.addAll(response.body()!!.results!!)
+                    val tracksDtos = response.body()?.results ?: emptyList()
+                    if (tracksDtos.isNotEmpty()){
+                        for (dto in tracksDtos){
+                            tracks.add(
+                                Track(
+                                    trackName = dto.trackName,
+                                    artistName = dto.artistName,
+                                    trackTimeMillis = dto.trackTimeMillis,
+                                    artworkUrl100 = dto.artworkUrl100,
+                                    trackId = dto.trackId?.toString(),
+                                    collectionName = dto.collectionName,
+                                    releaseDate = dto.releaseDate,
+                                    primaryGenreName = dto.primaryGenreName,
+                                    country = dto.country,
+                                    previewUrl = dto.previewUrl
+                                )
+                            )
+                        }
                     }
 
                     adapter.notifyDataSetChanged()
