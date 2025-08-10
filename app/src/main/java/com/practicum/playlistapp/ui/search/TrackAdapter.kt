@@ -7,17 +7,20 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistapp.R
-import com.practicum.playlistapp.ui.history.SearchHistory
 import com.practicum.playlistapp.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistapp.domain.usecase.AddToHistoryUseCase
 
-class TrackAdapter(private val tlist:List<Track>, private val searchHistory: SearchHistory, private val delayDebounce:()-> Boolean):RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private val tlist:List<Track>, private val addToHistoryUseCase: AddToHistoryUseCase, private val delayDebounce:()-> Boolean):RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
-        return TrackViewHolder(view, searchHistory, delayDebounce)
+        return TrackViewHolder(view, addToHistoryUseCase, delayDebounce)
     }
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tlist[position])
@@ -27,7 +30,7 @@ class TrackAdapter(private val tlist:List<Track>, private val searchHistory: Sea
         return tlist.size
     }
 
-    class TrackViewHolder(itemView: View, private val searchHistory: SearchHistory, private val delayDebounce:()-> Boolean ): RecyclerView.ViewHolder(itemView){
+    class TrackViewHolder(itemView: View, private val addToHistoryUseCase: AddToHistoryUseCase, private val delayDebounce:()-> Boolean ): RecyclerView.ViewHolder(itemView){
         private val imageTrack: ImageView = itemView.findViewById(R.id.imageTrack)
         private val trackName: TextView = itemView.findViewById(R.id.nameTrack)
         private val groupName: TextView = itemView.findViewById(R.id.nameGroup)
@@ -45,7 +48,7 @@ class TrackAdapter(private val tlist:List<Track>, private val searchHistory: Sea
             itemView.setOnClickListener {
                 try {
                     if (delayDebounce()){
-                        searchHistory.AddTrackToHistory(item)
+                        addToHistoryUseCase.execute(item)
                         SearchActivity.moveToMediatek(itemView.context, item)
                     }
 

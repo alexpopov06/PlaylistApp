@@ -1,5 +1,4 @@
-package com.practicum.playlistapp.domain.api
-
+package com.practicum.playlistapp.domain.repository
 
 import com.practicum.playlistapp.domain.models.Track
 

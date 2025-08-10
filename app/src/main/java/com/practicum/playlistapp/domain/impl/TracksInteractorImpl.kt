@@ -1,7 +1,7 @@
 package com.practicum.playlistapp.domain.impl
 
 import com.practicum.playlistapp.domain.api.TracksInteractor
-import com.practicum.playlistapp.domain.api.TracksRepository
+import com.practicum.playlistapp.domain.repository.TracksRepository
 
 class TracksInteractorImpl(private val repository: TracksRepository): TracksInteractor {
     override fun searchTrack(

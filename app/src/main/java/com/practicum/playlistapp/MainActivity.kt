@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.practicum.playlistapp.ui.media.MediatekActivity
 import com.practicum.playlistapp.ui.search.SearchActivity
+import com.practicum.playlistapp.ui.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

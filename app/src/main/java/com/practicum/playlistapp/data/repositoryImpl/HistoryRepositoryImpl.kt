@@ -1,15 +1,19 @@
-package com.practicum.playlistapp.ui.history
+package com.practicum.playlistapp.data.repositoryImpl
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.practicum.playlistapp.domain.models.Track
+import com.practicum.playlistapp.domain.repository.HistoryRepository
 
-class SearchHistory(val sharedPreferences: SharedPreferences) {
+class HistoryRepositoryImpl(private val sharedPreferences: SharedPreferences,
+                            private val gson: Gson): HistoryRepository {
     companion object {
         private const val HISTORY_KEY = "search_history"
         private const val MAX_HISTORY_ITEMS = 10
     }
-    fun AddTrackToHistory(track: Track){
+
+
+    override fun addTrackToHistory(track: Track) {
         val history = getHistory().toMutableList()
         val iterator = history.iterator()
         while (iterator.hasNext()) {
@@ -24,25 +28,18 @@ class SearchHistory(val sharedPreferences: SharedPreferences) {
         sharedPreferences.edit()
             .putString(HISTORY_KEY, Gson().toJson(history))
             .apply()
-
-
-
     }
-    fun getHistory():List<Track>{
+
+    override fun getHistory(): List<Track> {
         val json = sharedPreferences.getString(HISTORY_KEY, null) ?: return emptyList()
         val arrayType = Array<Track>::class.java
         val array = Gson().fromJson(json, arrayType)
         return array?.toList() ?: emptyList()
-
-
     }
-    fun clearHistory(){
+
+    override fun clearHistory() {
         sharedPreferences.edit()
             .remove(HISTORY_KEY)
             .apply()
-
     }
-
-
-
 }

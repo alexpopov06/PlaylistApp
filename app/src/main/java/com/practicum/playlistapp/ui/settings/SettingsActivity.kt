@@ -1,4 +1,4 @@
-package com.practicum.playlistapp
+package com.practicum.playlistapp.ui.settings
 
 import android.content.Intent
 import android.net.Uri
@@ -9,11 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.switchmaterial.SwitchMaterial
-
+import com.practicum.playlistapp.R
+import com.practicum.playlistapp.domain.repository.ThemeRepository
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var themeRepository: ThemeRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
+        themeRepository = (application as App).themeRepository
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings)) { view, insets ->
@@ -55,14 +59,12 @@ class SettingsActivity : AppCompatActivity() {
         }
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.my_switch)
 
-        themeSwitcher.isChecked = (application as App).darkTheme
+        themeSwitcher.isChecked = themeRepository.getCurrentTheme()
         themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as App).switchTheme(checked)
+            themeRepository.setTheme(checked)
 
 
         }
-
-
 
 
 

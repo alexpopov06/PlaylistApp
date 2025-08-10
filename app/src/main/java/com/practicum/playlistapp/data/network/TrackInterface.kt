@@ -1,6 +1,5 @@
 package com.practicum.playlistapp.data.network
 
-import com.practicum.playlistapp.TracksResponse
 import com.practicum.playlistapp.data.dto.SearchTracksResponse
 import retrofit2.Call
 import retrofit2.http.GET

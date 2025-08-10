@@ -15,15 +15,24 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import com.practicum.playlistapp.ui.media.MediatekActivity
 import com.practicum.playlistapp.R
-import com.practicum.playlistapp.ui.history.SearchHistory
 import com.practicum.playlistapp.domain.models.Track
 import com.practicum.playlistapp.ui.search.TrackAdapter
 import com.practicum.playlistapp.data.network.TrackInterface
-import com.practicum.playlistapp.TracksResponse
 import com.practicum.playlistapp.data.dto.SearchTracksResponse
+import com.practicum.playlistapp.data.repositoryImpl.HistoryRepositoryImpl
+import com.practicum.playlistapp.domain.usecase.AddToHistoryUseCase
+import com.practicum.playlistapp.domain.usecase.ClearHistoryUseCase
+import com.practicum.playlistapp.domain.usecase.GetHistoryUseCase
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -48,11 +57,14 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var nowifiText3: TextView
     private lateinit var update: MaterialButton
     private lateinit var adapter: TrackAdapter
-    private lateinit var searchHistory: SearchHistory
+
     private lateinit var youSearch: TextView
     private lateinit var clearHistory: Button
     private lateinit var progBar: ProgressBar
     private val tracks = mutableListOf<Track>()
+    private lateinit var addToHistoryUseCase: AddToHistoryUseCase
+    private lateinit var getHistoryUseCase: GetHistoryUseCase
+    private lateinit var clearHistoryUseCase: ClearHistoryUseCase
     private var isClickable = true
     private val handler = Handler(Looper.getMainLooper())
     val CLICK_DEBOUNCE_DELAY = 1000L
@@ -75,6 +87,12 @@ class SearchActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+        val sharedPrefs = getSharedPreferences("SearchHistoryPrefs", MODE_PRIVATE)
+        val gson = Gson()
+        val repository = HistoryRepositoryImpl(sharedPrefs, gson)
+        addToHistoryUseCase = AddToHistoryUseCase(repository)
+        getHistoryUseCase = GetHistoryUseCase(repository)
+        clearHistoryUseCase = ClearHistoryUseCase(repository)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.search)) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(
@@ -118,7 +136,7 @@ class SearchActivity : AppCompatActivity() {
             adapter.notifyDataSetChanged()
             youSearch.visibility = View.GONE
             clearHistory.visibility = View.GONE
-            searchHistory.clearHistory()
+            clearHistoryUseCase.execute()
 
         }
 
@@ -141,10 +159,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupAdapter() {
-        searchHistory = SearchHistory(
-            getSharedPreferences("SearchHistoryPrefs", MODE_PRIVATE)
-        )
-        adapter = TrackAdapter(tracks, searchHistory, ::delayDebounce)
+
+        adapter = TrackAdapter(tracks, addToHistoryUseCase, ::delayDebounce)
         rvTrack.adapter = adapter
         rvTrack.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
@@ -260,7 +276,7 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+            override fun onFailure(call: Call<SearchTracksResponse>, t: Throwable) {
                 progBar.visibility = View.GONE
                 lastFailedSearchQuery = query
                 showNoWifi()
@@ -316,7 +332,7 @@ class SearchActivity : AppCompatActivity() {
     private fun showSearchHistory() {
         emptyImage.visibility = View.GONE
         emptyText.visibility = View.GONE
-        val historyTracks = searchHistory.getHistory()
+        val historyTracks = getHistoryUseCase.execute()
         if (historyTracks.isNotEmpty()){
             youSearch.visibility= View.VISIBLE
             clearHistory.visibility= View.VISIBLE
@@ -328,7 +344,7 @@ class SearchActivity : AppCompatActivity() {
             youSearch.visibility= View.GONE
             clearHistory.visibility= View.GONE
             rvTrack.visibility = View.GONE
-            val historyTracks = searchHistory.getHistory()
+            val historyTracks = getHistoryUseCase.execute()
             tracks.clear()
             tracks.addAll(historyTracks)
             adapter.notifyDataSetChanged()
