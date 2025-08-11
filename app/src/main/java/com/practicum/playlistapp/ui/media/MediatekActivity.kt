@@ -39,14 +39,7 @@ class MediatekActivity : AppCompatActivity(), MediaPlayerInteractor.PlayerListen
     lateinit var handler: Handler
     private lateinit var player: MediaPlayerInteractor
 
-//    companion object {
-//        private const val STATE_DEFAULT = 0
-//        private const val STATE_PREPARED = 1
-//        private const val STATE_PLAYING = 2
-//        private const val STATE_PAUSED = 3
-//    }
 
-//    private var playerState = STATE_DEFAULT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()

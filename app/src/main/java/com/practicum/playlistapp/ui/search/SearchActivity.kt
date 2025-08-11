@@ -23,31 +23,26 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
+import com.practicum.playlistapp.Creator
 import com.practicum.playlistapp.ui.media.MediatekActivity
 import com.practicum.playlistapp.R
 import com.practicum.playlistapp.domain.models.Track
-import com.practicum.playlistapp.ui.search.TrackAdapter
-import com.practicum.playlistapp.data.network.TrackInterface
-import com.practicum.playlistapp.data.dto.SearchTracksResponse
-import com.practicum.playlistapp.data.repositoryImpl.HistoryRepositoryImpl
+
+
+
+
+import com.practicum.playlistapp.domain.api.TracksInteractor
+
 import com.practicum.playlistapp.domain.usecase.AddToHistoryUseCase
 import com.practicum.playlistapp.domain.usecase.ClearHistoryUseCase
 import com.practicum.playlistapp.domain.usecase.GetHistoryUseCase
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+
 
 class SearchActivity : AppCompatActivity() {
     private var searchText: String = ""
     private var inputEditText: EditText? = null
     private var lastFailedSearchQuery: String? = null
-    private val BaseUrl = "https://itunes.apple.com"
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+
     private lateinit var rvTrack: RecyclerView
     private lateinit var emptyImage: ImageView
     private lateinit var emptyText: TextView
@@ -57,8 +52,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var nowifiText3: TextView
     private lateinit var update: MaterialButton
     private lateinit var adapter: TrackAdapter
-
     private lateinit var youSearch: TextView
+    private val tracksInteractor: TracksInteractor = Creator.provideTracksInteractor()
     private lateinit var clearHistory: Button
     private lateinit var progBar: ProgressBar
     private val tracks = mutableListOf<Track>()
@@ -87,12 +82,12 @@ class SearchActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        val sharedPrefs = getSharedPreferences("SearchHistoryPrefs", MODE_PRIVATE)
-        val gson = Gson()
-        val repository = HistoryRepositoryImpl(sharedPrefs, gson)
-        addToHistoryUseCase = AddToHistoryUseCase(repository)
-        getHistoryUseCase = GetHistoryUseCase(repository)
-        clearHistoryUseCase = ClearHistoryUseCase(repository)
+
+
+        addToHistoryUseCase = Creator.provideAddToHistoryUseCase(this)
+        getHistoryUseCase = Creator.provideGetHistoryUseCase(this)
+        clearHistoryUseCase = Creator.provideClearHistoryUseCase(this)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.search)) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(
@@ -208,14 +203,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-//        inputEditText?.setOnEditorActionListener { _, actionId, _ ->
-//            if (actionId == EditorInfo.IME_ACTION_DONE && searchText.isNotEmpty()) {
-//                performSearch(searchText)
-//                true
-//            } else {
-//                false
-//            }
-//        }
+
     }
     private var lastRunnable: Runnable? = null
 
@@ -235,51 +223,26 @@ class SearchActivity : AppCompatActivity() {
         emptyImage.visibility = View.GONE
         emptyText.visibility = View.GONE
         hideNoWifi()
-        val movieApi = retrofit.create(TrackInterface::class.java)
-        movieApi.search(query).enqueue(object : Callback<SearchTracksResponse> {
-            override fun onResponse(call: Call<SearchTracksResponse>, response: Response<SearchTracksResponse>) {
-                progBar.visibility = View.GONE
-                if (response.code() == 200) {
-                    tracks.clear()
-                    val tracksDtos = response.body()?.results ?: emptyList()
-                    if (tracksDtos.isNotEmpty()){
-                        for (dto in tracksDtos){
-                            tracks.add(
-                                Track(
-                                    trackName = dto.trackName,
-                                    artistName = dto.artistName,
-                                    trackTimeMillis = dto.trackTimeMillis,
-                                    artworkUrl100 = dto.artworkUrl100,
-                                    trackId = dto.trackId?.toString(),
-                                    collectionName = dto.collectionName,
-                                    releaseDate = dto.releaseDate,
-                                    primaryGenreName = dto.primaryGenreName,
-                                    country = dto.country,
-                                    previewUrl = dto.previewUrl
-                                )
-                            )
-                        }
-                    }
 
+        tracksInteractor.searchTrack(query, object : TracksInteractor.TracksConsumer {
+            override fun consume(foundTracks: List<Track>) {
+                runOnUiThread {
+                    progBar.visibility = View.GONE
+
+
+                    tracks.clear()
+                    tracks.addAll(foundTracks)
                     adapter.notifyDataSetChanged()
 
-                    if (tracks.isNotEmpty()) {
+
+                    if (foundTracks.isNotEmpty()) {
                         NoEmptyList()
                     } else {
                         ShowEmptyList()
                     }
-                    lastFailedSearchQuery = null
-                } else {
-                    lastFailedSearchQuery = query
-                    progBar.visibility = View.GONE
-                    showNoWifi()
-                }
-            }
 
-            override fun onFailure(call: Call<SearchTracksResponse>, t: Throwable) {
-                progBar.visibility = View.GONE
-                lastFailedSearchQuery = query
-                showNoWifi()
+                    lastFailedSearchQuery = if (foundTracks.isEmpty()) query else null
+                }
             }
         })
     }
