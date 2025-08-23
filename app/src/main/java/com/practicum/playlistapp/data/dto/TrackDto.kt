@@ -1,8 +1,7 @@
-package com.practicum.playlistapp
+package com.practicum.playlistapp.data.dto
 
-import android.os.Parcelable
 
-data class Track(
+data class TrackDto(
     val trackName: String?,
     val artistName: String?,
     val trackTimeMillis: Long,

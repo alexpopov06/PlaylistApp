@@ -1,27 +1,28 @@
-package com.practicum.playlistapp
+package com.practicum.playlistapp.ui.media
 
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import com.practicum.playlistapp.Creator
+import com.practicum.playlistapp.R
+import com.practicum.playlistapp.domain.impl.MediaPlayerInteractorImpl
+import com.practicum.playlistapp.domain.media.MediaPlayerInteractor
+import com.practicum.playlistapp.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
-class MediatekActivity : AppCompatActivity() {
+class MediatekActivity : AppCompatActivity(), MediaPlayerInteractor.PlayerListener {
     private lateinit var image: ImageView
     private lateinit var artist: TextView
     private lateinit var trackName: TextView
@@ -34,21 +35,28 @@ class MediatekActivity : AppCompatActivity() {
     private lateinit var back: ImageButton
     private lateinit var time: TextView
     private lateinit var playButton: ImageView
-    private var mediaPlayer = MediaPlayer()
     private lateinit var url: String
     lateinit var handler: Handler
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-    }
+    private lateinit var player: MediaPlayerInteractor
 
-    private var playerState = STATE_DEFAULT
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mediatek)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.med)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                view.paddingLeft,
+                systemBars.top,
+                view.paddingRight,
+                systemBars.bottom
+            )
+            insets
+        }
+        player = Creator.createMediaPlayerInteractor()
+        player.setListener(this)
         initViews()
         back.setOnClickListener {
             finish()
@@ -57,10 +65,10 @@ class MediatekActivity : AppCompatActivity() {
         val track = Gson().fromJson(trackJson, Track::class.java)
         updateUI(track)
         url = track.previewUrl
-        preparePlayer()
+        player.preparePlayer(url) //keymoment
 
         playButton.setOnClickListener {
-            playbackControl()
+            player.playbackControl() //
         }
 
 
@@ -98,57 +106,77 @@ class MediatekActivity : AppCompatActivity() {
     private val progresRun = object: Runnable{
         override fun run() {
             time.setText(
-                SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+                SimpleDateFormat("mm:ss", Locale.getDefault()).format(player.getCurrentPosition())
             )
             handler.postDelayed(this, 500)
         }
     }
 
-    private fun preparePlayer() {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            playButton.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            playButton.setImageResource(R.drawable.play)
-            playerState = STATE_PREPARED
-            handler.removeCallbacks(progresRun)
-            time.setText("0:00")
+//    private fun preparePlayer() {
+//        mediaPlayer.setDataSource(url)
+//        mediaPlayer.prepareAsync()
+//        mediaPlayer.setOnPreparedListener {
+//            playButton.isEnabled = true
+//            playerState = STATE_PREPARED
+//        }
+//        mediaPlayer.setOnCompletionListener {
+//            playButton.setImageResource(R.drawable.play)
+//            playerState = STATE_PREPARED
+//            handler.removeCallbacks(progresRun)
+//            time.setText("0:00")
+//
+//        }
+//    }
 
-        }
+    override fun onPrepared() {
+        playButton.isEnabled = true
     }
-    private fun startPlayer() {
-        mediaPlayer.start()
+
+    override fun onPlaybackCompleted() {
+        playButton.setImageResource(R.drawable.play)
+        handler.removeCallbacks(progresRun)
+        time.setText("0:00")
+    }
+//    private fun startPlayer() {
+//        mediaPlayer.start()/////
+//        playButton.setImageResource(R.drawable.pause)
+//        playerState = STATE_PLAYING/////
+//        handler.postDelayed(progresRun, 500)
+//    }
+
+    override fun startingPlayer() {
         playButton.setImageResource(R.drawable.pause)
-        playerState = STATE_PLAYING
         handler.postDelayed(progresRun, 500)
     }
 
-    private fun pausePlayer() {
-        mediaPlayer.pause()
+//    private fun pausePlayer() {
+//        mediaPlayer.pause() ///
+//        playButton.setImageResource(R.drawable.play)
+//        playerState = STATE_PAUSED ///
+//        handler.removeCallbacks(progresRun)
+//    }
+
+    override fun pausingPlayer() {
         playButton.setImageResource(R.drawable.play)
-        playerState = STATE_PAUSED
         handler.removeCallbacks(progresRun)
     }
-    private fun playbackControl() {
-        when(playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
-            }
-        }
-    }
+//    private fun playbackControl() { //убрать
+//        when(playerState) {
+//            STATE_PLAYING -> {
+//                pausePlayer()
+//            }
+//            STATE_PREPARED, STATE_PAUSED -> {
+//                startPlayer()
+//            }
+//        }
+//    }
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        player.pausePlayer()
     }
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
+        player.releasePlayer()
     }
 
 
