@@ -1,5 +1,6 @@
 package com.practicum.playlistapp.data.repositoryImpl
 
+import com.practicum.playlistapp.creator.Resource
 import com.practicum.playlistapp.data.NetworkClient
 import com.practicum.playlistapp.data.dto.SearchTracksRequest
 import com.practicum.playlistapp.data.dto.SearchTracksResponse
@@ -14,27 +15,37 @@ class TracksRepositoryImpl(
     private val networkClient: NetworkClient
 ) : TracksRepository {
 
-    override fun searchTrack(expression: String): List<Track> {
+    override fun searchTrack(expression: String): Resource<List<Track>> {
         val response = networkClient.doRequest(SearchTracksRequest(expression))
-        return if (response.resultCode == 200) {
-            (response as SearchTracksResponse).results.map { dto ->
-                Track(
-                    trackName = dto.trackName,
-                    artistName = dto.artistName,
-                    trackTimeMillis = dto.trackTimeMillis,
-                    artworkUrl100 = dto.artworkUrl100,
-                    trackId = dto.trackId?.toString(),
-                    collectionName = dto.collectionName,
-                    releaseDate = dto.releaseDate,
-                    primaryGenreName = dto.primaryGenreName,
-                    country = dto.country,
-                    previewUrl = dto.previewUrl
-                )
+        return when (response.resultCode){
+            -1 ->{
+                Resource.Error("Проверьте подключение к интернету")
             }
-        } else {
-            emptyList()
+            200 -> {
+                val tracks = (response as SearchTracksResponse).results.map { dto ->
+                    Track(
+                        trackName = dto.trackName,
+                        artistName = dto.artistName,
+                        trackTimeMillis = dto.trackTimeMillis,
+                        artworkUrl100 = dto.artworkUrl100,
+                        trackId = dto.trackId?.toString(),
+                        collectionName = dto.collectionName,
+                        releaseDate = dto.releaseDate,
+                        primaryGenreName = dto.primaryGenreName,
+                        country = dto.country,
+                        previewUrl = dto.previewUrl
+                    )
+                }
+                Resource.Success(tracks)
+            }else -> {
+                Resource.Error("Ошибка сервера")
+            }
+
+
         }
     }
+
+
 
     override fun search(query: String): Call<List<Track>> {
         return object : Call<List<Track>> {

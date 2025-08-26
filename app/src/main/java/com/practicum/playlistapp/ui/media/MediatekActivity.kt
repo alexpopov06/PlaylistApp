@@ -13,7 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
-import com.practicum.playlistapp.Creator
+import com.practicum.playlistapp.creator.Creator
 import com.practicum.playlistapp.R
 import com.practicum.playlistapp.domain.impl.MediaPlayerInteractorImpl
 import com.practicum.playlistapp.domain.media.MediaPlayerInteractor

@@ -17,7 +17,7 @@ import java.util.Locale
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistapp.domain.usecase.AddToHistoryUseCase
 
-class TrackAdapter(private val tlist:List<Track>, private val addToHistoryUseCase: AddToHistoryUseCase, private val delayDebounce:()-> Boolean):RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter( var tlist:List<Track>, private val addToHistoryUseCase: AddToHistoryUseCase, private val delayDebounce:()-> Boolean):RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
         return TrackViewHolder(view, addToHistoryUseCase, delayDebounce)
@@ -28,6 +28,10 @@ class TrackAdapter(private val tlist:List<Track>, private val addToHistoryUseCas
 
     override fun getItemCount(): Int {
         return tlist.size
+    }
+    fun updateTracks(newTracks: List<Track>) {
+        tlist = newTracks
+        notifyDataSetChanged()
     }
 
     class TrackViewHolder(itemView: View, private val addToHistoryUseCase: AddToHistoryUseCase, private val delayDebounce:()-> Boolean ): RecyclerView.ViewHolder(itemView){

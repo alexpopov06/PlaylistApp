@@ -1,17 +1,33 @@
 package com.practicum.playlistapp.domain.impl
 
+import android.os.Handler
+import android.os.Looper
+import com.practicum.playlistapp.creator.Resource
 import com.practicum.playlistapp.domain.api.TracksInteractor
 import com.practicum.playlistapp.domain.repository.TracksRepository
 
 class TracksInteractorImpl(private val repository: TracksRepository): TracksInteractor {
+    private val handler = Handler(Looper.getMainLooper())
+
     override fun searchTrack(
         expression: String,
         consumer: TracksInteractor.TracksConsumer
     ) {
         val t = Thread {
-            consumer.consume(repository.searchTrack(expression))
+            when(val resource = repository.searchTrack(expression)) {
+                is Resource.Success -> {
+                    handler.post {
+                        consumer.consume(resource.data ?: emptyList(), null)
+                    }
+                }
+                is Resource.Error -> {
+
+                    handler.post {
+                        consumer.consume(emptyList(), resource.message)
+                    }
+                }
+            }
         }
         t.start()
     }
-
 }

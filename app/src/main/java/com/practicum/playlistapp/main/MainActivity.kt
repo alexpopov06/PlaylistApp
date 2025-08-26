@@ -1,4 +1,4 @@
-package com.practicum.playlistapp.ui.main
+package com.practicum.playlistapp.main
 
 import android.content.Intent
 import android.os.Bundle
