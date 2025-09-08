@@ -1,19 +1,23 @@
 package com.practicum.playlistapp.player.presentation
 
-import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.practicum.playlistapp.creator.Creator
+import com.practicum.playlistapp.player.domain.api.MediaPlayerInteractor
 import com.practicum.playlistapp.search.domain.model.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.Timer
+import java.util.TimerTask
 
-class MediaPlayerViewModel(private val track: Track) : ViewModel() {
+class MediaPlayerViewModel(
+    private val mediaPlayerInteractor: MediaPlayerInteractor,
+    private val track: Track
+) : ViewModel(), MediaPlayerInteractor.PlayerListener {
 
     companion object {
         const val STATE_DEFAULT = 0
@@ -23,7 +27,8 @@ class MediaPlayerViewModel(private val track: Track) : ViewModel() {
 
         fun getFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                MediaPlayerViewModel(track)
+                val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor()
+                MediaPlayerViewModel(mediaPlayerInteractor, track)
             }
         }
     }
@@ -37,68 +42,66 @@ class MediaPlayerViewModel(private val track: Track) : ViewModel() {
     private val trackLiveData = MutableLiveData(track)
     fun observeTrack(): LiveData<Track> = trackLiveData
 
-    private val mediaPlayer = MediaPlayer()
-    private val handler = Handler(Looper.getMainLooper())
     private val timeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-
-    private val timerRunnable = Runnable {
-        if (playerStateLiveData.value == STATE_PLAYING) {
-            updateProgress()
-        }
-    }
+    private var timer: Timer? = null
 
     init {
+        mediaPlayerInteractor.setListener(this)
         preparePlayer()
     }
 
     override fun onCleared() {
         super.onCleared()
-        mediaPlayer.release()
-        resetTimer()
+        stopTimer()
+        mediaPlayerInteractor.releasePlayer()
     }
 
     fun onPlayButtonClicked() {
-        when(playerStateLiveData.value) {
-            STATE_PLAYING -> pausePlayer()
-            STATE_PREPARED, STATE_PAUSED -> startPlayer()
-        }
+        mediaPlayerInteractor.playbackControl()
     }
 
     private fun preparePlayer() {
-        mediaPlayer.setDataSource(track.previewUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            playerStateLiveData.postValue(STATE_PREPARED)
-        }
-        mediaPlayer.setOnCompletionListener {
-            playerStateLiveData.postValue(STATE_PREPARED)
-            resetTimer()
-        }
+        mediaPlayerInteractor.preparePlayer(track.previewUrl)
     }
 
-    private fun startPlayer() {
-        mediaPlayer.start()
-        playerStateLiveData.postValue(STATE_PLAYING)
-        updateProgress()
+    private fun startTimer() {
+        stopTimer()
+        timer = Timer()
+        timer?.schedule(object : TimerTask() {
+            override fun run() {
+                updateProgress()
+            }
+        }, 0, 200)
     }
 
-    private fun pausePlayer() {
-        pauseTimer()
-        mediaPlayer.pause()
-        playerStateLiveData.postValue(STATE_PAUSED)
+    private fun stopTimer() {
+        timer?.cancel()
+        timer = null
     }
 
     private fun updateProgress() {
-        progressTimeLiveData.postValue(timeFormat.format(mediaPlayer.currentPosition))
-        handler.postDelayed(timerRunnable, 500)
+        val position = mediaPlayerInteractor.getCurrentPosition()
+        progressTimeLiveData.postValue(timeFormat.format(position))
     }
 
-    private fun pauseTimer() {
-        handler.removeCallbacks(timerRunnable)
+    // Реализация PlayerListener
+    override fun onPrepared() {
+        playerStateLiveData.postValue(STATE_PREPARED)
     }
 
-    private fun resetTimer() {
-        handler.removeCallbacks(timerRunnable)
+    override fun onPlaybackCompleted() {
+        playerStateLiveData.postValue(STATE_PREPARED)
+        stopTimer()
         progressTimeLiveData.postValue("00:00")
+    }
+
+    override fun startingPlayer() {
+        playerStateLiveData.postValue(STATE_PLAYING)
+        startTimer()
+    }
+
+    override fun pausingPlayer() {
+        playerStateLiveData.postValue(STATE_PAUSED)
+        stopTimer()
     }
 }

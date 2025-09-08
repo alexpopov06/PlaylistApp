@@ -38,7 +38,7 @@ class TracksViewModel(private val tracksInteractor: TracksInteractor) : ViewMode
         }
     }
 
-    /** Отложенный поиск с дебаунсом и блокировкой одинаковых запросов */
+
     fun searchDebounce(changedText: String) {
         Log.d(TAG, "searchDebounce: text='$changedText', latest='$latestSearchText'")
 

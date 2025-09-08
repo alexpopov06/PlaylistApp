@@ -5,11 +5,11 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.practicum.playlistapp.R
@@ -34,7 +34,11 @@ class MediatekActivity : AppCompatActivity() {
     private lateinit var time: TextView
     private lateinit var playButton: ImageView
 
-    private lateinit var viewModel: MediaPlayerViewModel
+    private lateinit var track: Track
+
+    private val viewModel: MediaPlayerViewModel by viewModels {
+        MediaPlayerViewModel.getFactory(track)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -55,11 +59,9 @@ class MediatekActivity : AppCompatActivity() {
         initViews()
 
         val trackJson = intent.getStringExtra("TRACK_EXTRA")
-        val track = Gson().fromJson(trackJson, Track::class.java)
+        track = Gson().fromJson(trackJson, Track::class.java)
 
-        // Инициализация ViewModel
-        viewModel = ViewModelProvider(this, MediaPlayerViewModel.Companion.getFactory(track))
-            .get(MediaPlayerViewModel::class.java)
+
 
         setupObservers()
         setupClickListeners()

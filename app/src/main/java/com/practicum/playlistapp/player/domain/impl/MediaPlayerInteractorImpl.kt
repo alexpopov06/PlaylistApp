@@ -1,73 +1,43 @@
 package com.practicum.playlistapp.player.domain.impl
 
-import android.media.MediaPlayer
 import com.practicum.playlistapp.player.domain.api.MediaPlayerInteractor
 
-class MediaPlayerInteractorImpl: MediaPlayerInteractor {
-
-    private val mediaPlayer = MediaPlayer()
-    private var playerState = 0
-    private var listener: MediaPlayerInteractor.PlayerListener? = null
+class MediaPlayerInteractorImpl(
+    private val playerController: MediaPlayerInteractor.PlayerController
+) : MediaPlayerInteractor {
 
     override fun preparePlayer(url: String) {
-
-        mediaPlayer.apply {
-            setDataSource(url)
-
-            setOnPreparedListener {
-
-
-                playerState = MediaPlayerInteractor.Companion.STATE_PREPARED
-                listener?.onPrepared()
-            }
-            setOnCompletionListener {
-                playerState = MediaPlayerInteractor.Companion.STATE_PREPARED
-
-                listener?.onPlaybackCompleted()
-            }
-            prepareAsync()
-        }
-
+        playerController.preparePlayer(url)
     }
 
     override fun startPlayer() {
-
-        mediaPlayer.start()
-
-        playerState = MediaPlayerInteractor.Companion.STATE_PLAYING
-        listener?.startingPlayer()
+        playerController.startPlayer()
     }
 
     override fun pausePlayer() {
-
-        mediaPlayer.pause()
-        playerState = MediaPlayerInteractor.Companion.STATE_PAUSED
-        listener?.pausingPlayer()
-
+        playerController.pausePlayer()
     }
 
     override fun playbackControl() {
-        when(playerState) {
-            MediaPlayerInteractor.Companion.STATE_PLAYING -> {
+        when(playerController.getPlayerState()) {
+            MediaPlayerInteractor.STATE_PLAYING -> {
                 pausePlayer()
             }
-            MediaPlayerInteractor.Companion.STATE_PREPARED, MediaPlayerInteractor.Companion.STATE_PAUSED -> {
+            MediaPlayerInteractor.STATE_PREPARED, MediaPlayerInteractor.STATE_PAUSED -> {
                 startPlayer()
             }
         }
     }
 
     override fun releasePlayer() {
-        mediaPlayer.release()
+        playerController.releasePlayer()
     }
 
     override fun getCurrentPosition(): Long {
-        return mediaPlayer.currentPosition.toLong()
+        return playerController.getCurrentPosition()
     }
 
     override fun setListener(listener: MediaPlayerInteractor.PlayerListener) {
-        this.listener = listener
+        playerController.setListener(listener)
     }
-
-
 }
