@@ -7,6 +7,6 @@ sealed class SearchState {
     data class Empty(val showClearButton: Boolean = true) : SearchState()
     data class Error(val showClearButton: Boolean = true) : SearchState()
     data object NoWifi : SearchState()
-    data object History : SearchState()
+    data class History(val tracks: List<Track>) : SearchState()
     data object Idle : SearchState()
 }

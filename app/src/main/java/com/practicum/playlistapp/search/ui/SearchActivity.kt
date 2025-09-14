@@ -22,10 +22,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import com.practicum.playlistapp.R
-import com.practicum.playlistapp.creator.Creator
 import com.practicum.playlistapp.search.domain.model.Track
 import com.practicum.playlistapp.search.presentation.TracksViewModel
 import com.practicum.playlistapp.player.ui.MediatekActivity
+import com.practicum.playlistapp.search.domain.usecase.AddToHistoryUseCase
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class SearchActivity : AppCompatActivity() {
@@ -46,7 +48,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var progBar: ProgressBar
     private lateinit var buttonBack: MaterialButton
 
-    private var viewModel: TracksViewModel? = null
+    private val viewModel: TracksViewModel by viewModel()
 
     companion object {
         private const val TAG = "SearchActivity"
@@ -79,9 +81,6 @@ class SearchActivity : AppCompatActivity() {
 
 
 
-        viewModel = ViewModelProvider(this, TracksViewModel.Companion.getFactory())
-            .get(TracksViewModel::class.java)
-
 
         viewModel?.observeState()?.observe(this) {
             Log.d(TAG, "State observed: $it")
@@ -103,8 +102,9 @@ class SearchActivity : AppCompatActivity() {
         clearIcon = findViewById(R.id.clearIcon)
         progBar = findViewById(R.id.progressBar)
         buttonBack = findViewById(R.id.button_back)
+        val addToHistoryUseCase: AddToHistoryUseCase by inject()
 
-        adapter = TrackAdapter(mutableListOf(), Creator.provideAddToHistoryUseCase()) {
+        adapter = TrackAdapter(mutableListOf(), addToHistoryUseCase) {
             Log.d(TAG, "Track clicked, debouncing")
             viewModel!!.delayDebounce()
         }
@@ -237,15 +237,12 @@ class SearchActivity : AppCompatActivity() {
             }
 
             is SearchState.History -> {
-                Log.d(TAG, "Showing history state")
-                val historyTracks = Creator.provideGetHistoryUseCase().execute()
-                Log.d(TAG, "History tracks count: ${historyTracks.size}")
 
-                if (historyTracks.isNotEmpty()) {
+                if (state.tracks.isNotEmpty()) {
                     rvTrack.visibility = View.VISIBLE
                     youSearch.visibility = View.VISIBLE
                     clearHistory.visibility = View.VISIBLE
-                    adapter.updateTracks(historyTracks)
+                    adapter.updateTracks(state.tracks)
                 }
                 showClearButton(false)
             }

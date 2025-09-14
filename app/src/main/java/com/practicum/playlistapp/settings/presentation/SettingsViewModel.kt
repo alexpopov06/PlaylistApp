@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistapp.creator.Creator
 import com.practicum.playlistapp.settings.domain.repository.ThemeRepository
 import com.practicum.playlistapp.sharing.domain.api.SharingInteractor
 
@@ -26,13 +25,5 @@ class SettingsViewModel(
 
     fun agreement() = sharingInteractor.agreement()
 
-    companion object {
-        fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val themeRepository = Creator.provideThemeRepository()
-                val sharingInteractor = Creator.provideSharingInteractor()
-                SettingsViewModel(themeRepository, sharingInteractor)
-            }
-        }
-    }
+
 }

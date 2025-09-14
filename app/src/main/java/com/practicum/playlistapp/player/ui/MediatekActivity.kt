@@ -5,7 +5,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,6 +14,8 @@ import com.google.gson.Gson
 import com.practicum.playlistapp.R
 import com.practicum.playlistapp.player.presentation.MediaPlayerViewModel
 import com.practicum.playlistapp.search.domain.model.Track
+import org.koin.android.ext.android.getKoin
+import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -33,12 +34,11 @@ class MediatekActivity : AppCompatActivity() {
     private lateinit var back: ImageButton
     private lateinit var time: TextView
     private lateinit var playButton: ImageView
+    private lateinit var viewModel: MediaPlayerViewModel
 
     private lateinit var track: Track
 
-    private val viewModel: MediaPlayerViewModel by viewModels {
-        MediaPlayerViewModel.getFactory(track)
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -60,6 +60,8 @@ class MediatekActivity : AppCompatActivity() {
 
         val trackJson = intent.getStringExtra("TRACK_EXTRA")
         track = Gson().fromJson(trackJson, Track::class.java)
+        viewModel = getKoin().get { parametersOf(track) }
+        viewModel.preparePlayer()
 
 
 

@@ -1,18 +1,25 @@
 package com.practicum.playlistapp
 
 import android.app.Application
-import com.practicum.playlistapp.creator.Creator
+import com.practicum.playlistapp.player.di.playerModule
+import com.practicum.playlistapp.search.di.searchModule
+import com.practicum.playlistapp.settings.di.settingsModule
 import com.practicum.playlistapp.settings.domain.repository.ThemeRepository
+import com.practicum.playlistapp.sharing.di.sharingModule
+import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.startKoin
 
 class App : Application() {
-    private lateinit var themeRepository: ThemeRepository
 
     override fun onCreate() {
         super.onCreate()
-        Creator.initialize(this)
-
-        // Получаем репозиторий через Creator, что обеспечивает инверсию зависимостей
-        themeRepository = Creator.provideThemeRepository()
+        startKoin{
+            androidContext(this@App)
+            modules(settingsModule, sharingModule, playerModule, searchModule)
+        }
+        val themeRepository = getKoin().get<ThemeRepository>()
         themeRepository.applyTheme(themeRepository.getCurrentTheme())
+
     }
 }
