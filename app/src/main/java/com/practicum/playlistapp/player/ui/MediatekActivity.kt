@@ -14,13 +14,15 @@ import com.google.gson.Gson
 import com.practicum.playlistapp.R
 import com.practicum.playlistapp.player.presentation.MediaPlayerViewModel
 import com.practicum.playlistapp.search.domain.model.Track
-import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class MediatekActivity : AppCompatActivity() {
+
 
     private lateinit var image: ImageView
     private lateinit var artist: TextView
@@ -30,13 +32,23 @@ class MediatekActivity : AppCompatActivity() {
     private lateinit var type: TextView
     private lateinit var country: TextView
     private lateinit var albom: TextView
-    private val timeTrack = SimpleDateFormat("mm:ss", Locale.getDefault())
     private lateinit var back: ImageButton
     private lateinit var time: TextView
     private lateinit var playButton: ImageView
-    private lateinit var viewModel: MediaPlayerViewModel
 
-    private lateinit var track: Track
+
+    private val timeTrack = SimpleDateFormat("mm:ss", Locale.getDefault())
+
+    private val gson: Gson by inject()
+    private val track: Track by lazy {
+        val trackJson = intent.getStringExtra("TRACK_EXTRA")
+        gson.fromJson(trackJson, Track::class.java)
+    }
+
+
+    private val viewModel: MediaPlayerViewModel by viewModel {
+        parametersOf(track)
+    }
 
 
 
@@ -44,6 +56,7 @@ class MediatekActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mediatek)
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.med)) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -58,12 +71,11 @@ class MediatekActivity : AppCompatActivity() {
 
         initViews()
 
-        val trackJson = intent.getStringExtra("TRACK_EXTRA")
-        track = Gson().fromJson(trackJson, Track::class.java)
-        viewModel = getKoin().get { parametersOf(track) }
+
+
+
+
         viewModel.preparePlayer()
-
-
 
         setupObservers()
         setupClickListeners()
@@ -71,30 +83,30 @@ class MediatekActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
+
         viewModel.observePlayerState().observe(this, Observer { state ->
             when (state) {
                 MediaPlayerViewModel.Companion.STATE_PLAYING -> {
                     playButton.setImageResource(R.drawable.pause)
                 }
-
                 MediaPlayerViewModel.Companion.STATE_PAUSED -> {
                     playButton.setImageResource(R.drawable.play)
                 }
-
                 MediaPlayerViewModel.Companion.STATE_PREPARED -> {
                     playButton.isEnabled = true
                     playButton.setImageResource(R.drawable.play)
                 }
-
                 MediaPlayerViewModel.Companion.STATE_DEFAULT -> {
                     playButton.isEnabled = false
                 }
             }
         })
 
+
         viewModel.observeProgressTime().observe(this, Observer { progressTime ->
             time.text = progressTime
         })
+
 
         viewModel.observeTrack().observe(this, Observer { track ->
             updateUI(track)
@@ -102,16 +114,19 @@ class MediatekActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
+
         back.setOnClickListener {
             finish()
         }
 
+        // Кнопка play/pause
         playButton.setOnClickListener {
             viewModel.onPlayButtonClicked()
         }
     }
 
-    fun updateUI(track: Track) {
+
+    private fun updateUI(track: Track) {
         artist.text = track.artistName
         trackName.text = track.trackName
         albom.text = track.collectionName
@@ -121,13 +136,14 @@ class MediatekActivity : AppCompatActivity() {
         type.text = track.primaryGenreName
         country.text = track.country
 
+        // Загрузка изображения с Glide
         Glide.with(this)
             .load(track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
             .placeholder(R.drawable.placeholdersvg)
             .into(image)
     }
 
-    fun initViews() {
+    private fun initViews() {
         image = findViewById(R.id.imageTrack)
         artist = findViewById(R.id.ArtistName)
         trackName = findViewById(R.id.TrackName)
@@ -143,6 +159,7 @@ class MediatekActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+
         if (viewModel.observePlayerState().value == MediaPlayerViewModel.Companion.STATE_PLAYING) {
             viewModel.onPlayButtonClicked()
         }

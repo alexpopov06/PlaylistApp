@@ -27,8 +27,9 @@ interface MediaPlayerInteractor {
     }
 
     companion object {
-        const val STATE_PREPARED = 0
-        const val STATE_PLAYING = 1
-        const val STATE_PAUSED = 2
+        const val STATE_DEFAULT = 0
+        const val STATE_PREPARED = 1
+        const val STATE_PLAYING = 2
+        const val STATE_PAUSED = 3
     }
 }
