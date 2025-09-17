@@ -27,14 +27,14 @@ class HistoryRepositoryImpl(private val sharedPreferences: SharedPreferences,
             history.removeAt(history.size - 1)
         }
         sharedPreferences.edit()
-            .putString(HISTORY_KEY, Gson().toJson(history))
+            .putString(HISTORY_KEY, gson.toJson(history))
             .apply()
     }
 
     override fun getHistory(): List<Track> {
         val json = sharedPreferences.getString(HISTORY_KEY, null) ?: return emptyList()
         val arrayType = Array<Track>::class.java
-        val array = Gson().fromJson(json, arrayType)
+        val array = gson.fromJson(json, arrayType)
         return array?.toList() ?: emptyList()
     }
 
