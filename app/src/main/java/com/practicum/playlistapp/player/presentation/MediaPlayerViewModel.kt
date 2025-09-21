@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistapp.creator.Creator
 import com.practicum.playlistapp.player.domain.api.MediaPlayerInteractor
 import com.practicum.playlistapp.search.domain.model.Track
 import java.text.SimpleDateFormat
@@ -25,12 +24,6 @@ class MediaPlayerViewModel(
         const val STATE_PLAYING = 2
         const val STATE_PAUSED = 3
 
-        fun getFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor()
-                MediaPlayerViewModel(mediaPlayerInteractor, track)
-            }
-        }
     }
 
     private val playerStateLiveData = MutableLiveData(STATE_DEFAULT)
@@ -47,7 +40,6 @@ class MediaPlayerViewModel(
 
     init {
         mediaPlayerInteractor.setListener(this)
-        preparePlayer()
     }
 
     override fun onCleared() {
@@ -60,7 +52,7 @@ class MediaPlayerViewModel(
         mediaPlayerInteractor.playbackControl()
     }
 
-    private fun preparePlayer() {
+     fun preparePlayer() {
         mediaPlayerInteractor.preparePlayer(track.previewUrl)
     }
 

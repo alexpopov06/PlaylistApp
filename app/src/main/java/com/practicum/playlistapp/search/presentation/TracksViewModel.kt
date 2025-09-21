@@ -11,11 +11,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistapp.creator.Creator
 import com.practicum.playlistapp.search.domain.api.TracksInteractor
 import com.practicum.playlistapp.search.domain.model.Track
+import com.practicum.playlistapp.search.domain.usecase.AddToHistoryUseCase
+import com.practicum.playlistapp.search.domain.usecase.ClearHistoryUseCase
+import com.practicum.playlistapp.search.domain.usecase.GetHistoryUseCase
 
-class TracksViewModel(private val tracksInteractor: TracksInteractor) : ViewModel() {
+class TracksViewModel(private val tracksInteractor: TracksInteractor, private val addToHistoryUseCase: AddToHistoryUseCase,
+                      private val getHistoryUseCase: GetHistoryUseCase, // ← ДОБАВЛЯЕМ зависимость
+                      private val clearHistoryUseCase: ClearHistoryUseCase) : ViewModel() {
 
     private var lastFailedSearchQuery: String? = null
     private var latestSearchText: String? = null
@@ -30,12 +34,7 @@ class TracksViewModel(private val tracksInteractor: TracksInteractor) : ViewMode
         const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val TAG = "TracksViewModel"
 
-        fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val interactor = Creator.provideTracksInteractor()
-                TracksViewModel(interactor)
-            }
-        }
+
     }
 
 
@@ -118,19 +117,19 @@ class TracksViewModel(private val tracksInteractor: TracksInteractor) : ViewMode
     fun clearHistory() {
         Log.d(TAG, "clearHistory")
         handler.removeCallbacksAndMessages(null)
-        Creator.provideClearHistoryUseCase().execute()
+        clearHistoryUseCase.execute()
         renderState(SearchState.Idle)
     }
 
     fun showSearchHistory() {
         Log.d(TAG, "showSearchHistory")
         handler.removeCallbacksAndMessages(null)
-        val historyTracks = Creator.provideGetHistoryUseCase().execute()
+        val historyTracks = getHistoryUseCase.execute()
         Log.d(TAG, "History tracks count: ${historyTracks.size}")
         if (historyTracks.isEmpty()) {
             renderState(SearchState.Idle)
         } else {
-            renderState(SearchState.History)
+            renderState(SearchState.History(historyTracks))
         }
     }
 
