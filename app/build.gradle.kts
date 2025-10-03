@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+
     namespace = "com.practicum.playlistapp"
     compileSdk = 35
 
@@ -26,12 +27,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+    buildFeatures {
+        viewBinding = true
     }
 }
 
@@ -55,6 +60,10 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation ("androidx.activity:activity-ktx:1.6.1")
     implementation ("io.insert-koin:koin-android:3.3.0")
+    implementation ("com.google.android.material:material:1.8.0")
+    implementation ("androidx.fragment:fragment-ktx:1.5.5")
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
+
 
 
 }

@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import com.practicum.playlistapp.R
-import com.practicum.playlistapp.player.ui.MediatekActivity
+import com.practicum.playlistapp.player.ui.PlayerActivity
 import com.practicum.playlistapp.search.domain.model.Track
 import com.practicum.playlistapp.search.domain.usecase.AddToHistoryUseCase
 import com.practicum.playlistapp.search.presentation.TracksViewModel
@@ -66,7 +66,7 @@ class SearchActivity : AppCompatActivity() {
 
 
         fun moveToMediatek(context: Context, track: Track, gson: Gson) {
-            val intent = Intent(context, MediatekActivity::class.java)
+            val intent = Intent(context, PlayerActivity::class.java)
             val trackJson = gson.toJson(track)
             intent.putExtra("TRACK_EXTRA", trackJson)
             context.startActivity(intent)

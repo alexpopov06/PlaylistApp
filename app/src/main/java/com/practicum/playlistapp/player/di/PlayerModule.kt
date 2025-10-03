@@ -2,10 +2,10 @@ package com.practicum.playlistapp.player.di
 
 import android.media.MediaPlayer
 import com.google.gson.Gson
-import com.practicum.playlistapp.player.data.MediaRepository
-import com.practicum.playlistapp.player.domain.api.MediaPlayerInteractor
-import com.practicum.playlistapp.player.domain.impl.MediaPlayerInteractorImpl
-import com.practicum.playlistapp.player.presentation.MediaPlayerViewModel
+import com.practicum.playlistapp.player.data.PlayerRepository
+import com.practicum.playlistapp.player.domain.api.PlayerInteractor
+import com.practicum.playlistapp.player.domain.impl.PlayerInteractorImpl
+import com.practicum.playlistapp.player.presentation.PlayerViewModel
 import com.practicum.playlistapp.search.domain.model.Track
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -14,18 +14,18 @@ val playerModule = module {
 
     factory { MediaPlayer() }
 
-    single<MediaPlayerInteractor.PlayerController> {
-        MediaRepository(mediaPlayerProvider = { get() })
+    single<PlayerInteractor.PlayerController> {
+        PlayerRepository(mediaPlayerProvider = { get() })
     }
 
-    single<MediaPlayerInteractor> {
-        MediaPlayerInteractorImpl(
+    single<PlayerInteractor> {
+        PlayerInteractorImpl(
             playerController = get()
         )
     }
 
     viewModel { (track: Track) ->
-        MediaPlayerViewModel(
+        PlayerViewModel(
             mediaPlayerInteractor = get(),
             track = track
         )

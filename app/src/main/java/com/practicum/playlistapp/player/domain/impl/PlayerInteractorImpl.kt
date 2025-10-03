@@ -1,10 +1,10 @@
 package com.practicum.playlistapp.player.domain.impl
 
-import com.practicum.playlistapp.player.domain.api.MediaPlayerInteractor
+import com.practicum.playlistapp.player.domain.api.PlayerInteractor
 
-class MediaPlayerInteractorImpl(
-    private val playerController: MediaPlayerInteractor.PlayerController
-) : MediaPlayerInteractor {
+class PlayerInteractorImpl(
+    private val playerController: PlayerInteractor.PlayerController
+) : PlayerInteractor {
 
     override fun preparePlayer(url: String) {
         playerController.preparePlayer(url)
@@ -20,10 +20,10 @@ class MediaPlayerInteractorImpl(
 
     override fun playbackControl() {
         when(playerController.getPlayerState()) {
-            MediaPlayerInteractor.STATE_PLAYING -> {
+            PlayerInteractor.STATE_PLAYING -> {
                 pausePlayer()
             }
-            MediaPlayerInteractor.STATE_PREPARED, MediaPlayerInteractor.STATE_PAUSED -> {
+            PlayerInteractor.STATE_PREPARED, PlayerInteractor.STATE_PAUSED -> {
                 startPlayer()
             }
         }
@@ -37,7 +37,7 @@ class MediaPlayerInteractorImpl(
         return playerController.getCurrentPosition()
     }
 
-    override fun setListener(listener: MediaPlayerInteractor.PlayerListener) {
+    override fun setListener(listener: PlayerInteractor.PlayerListener) {
         playerController.setListener(listener)
     }
 }

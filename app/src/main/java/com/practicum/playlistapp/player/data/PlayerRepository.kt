@@ -1,15 +1,15 @@
 package com.practicum.playlistapp.player.data
 
 import android.media.MediaPlayer
-import com.practicum.playlistapp.player.domain.api.MediaPlayerInteractor
+import com.practicum.playlistapp.player.domain.api.PlayerInteractor
 
-class MediaRepository(
+class PlayerRepository(
     private val mediaPlayerProvider: () -> MediaPlayer
-) : MediaPlayerInteractor.PlayerController {
+) : PlayerInteractor.PlayerController {
 
     private var mediaPlayer: MediaPlayer = mediaPlayerProvider()
-    private var playerState = MediaPlayerInteractor.STATE_DEFAULT
-    private var listener: MediaPlayerInteractor.PlayerListener? = null
+    private var playerState = PlayerInteractor.STATE_DEFAULT
+    private var listener: PlayerInteractor.PlayerListener? = null
     private var isReleased = false
 
     override fun preparePlayer(url: String) {
@@ -21,12 +21,12 @@ class MediaRepository(
         }
 
         mediaPlayer.setOnPreparedListener {
-            playerState = MediaPlayerInteractor.STATE_PREPARED
+            playerState = PlayerInteractor.STATE_PREPARED
             listener?.onPrepared()
         }
 
         mediaPlayer.setOnCompletionListener {
-            playerState = MediaPlayerInteractor.STATE_PREPARED
+            playerState = PlayerInteractor.STATE_PREPARED
             listener?.onPlaybackCompleted()
         }
 
@@ -37,7 +37,7 @@ class MediaRepository(
     override fun startPlayer() {
         if (!isReleased) {
             mediaPlayer.start()
-            playerState = MediaPlayerInteractor.STATE_PLAYING
+            playerState = PlayerInteractor.STATE_PLAYING
             listener?.startingPlayer()
         }
     }
@@ -45,7 +45,7 @@ class MediaRepository(
     override fun pausePlayer() {
         if (!isReleased && mediaPlayer.isPlaying) {
             mediaPlayer.pause()
-            playerState = MediaPlayerInteractor.STATE_PAUSED
+            playerState = PlayerInteractor.STATE_PAUSED
             listener?.pausingPlayer()
         }
     }
@@ -55,7 +55,7 @@ class MediaRepository(
             mediaPlayer.release()
             isReleased = true
             listener = null
-            playerState = MediaPlayerInteractor.STATE_DEFAULT
+            playerState = PlayerInteractor.STATE_DEFAULT
         }
     }
 
@@ -63,7 +63,7 @@ class MediaRepository(
         return if (!isReleased) mediaPlayer.currentPosition.toLong() else 0L
     }
 
-    override fun setListener(listener: MediaPlayerInteractor.PlayerListener) {
+    override fun setListener(listener: PlayerInteractor.PlayerListener) {
         this.listener = listener
     }
 
