@@ -26,11 +26,13 @@ class MediaActivity : AppCompatActivity() {
         }
         val adapter = FragmentsAdapter(this)
         binding.viewPager2.adapter = adapter
+
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager2) { tab, position ->
             when (position) {
                 0 -> tab.text = "Избранные треки"
                 1 -> tab.text = "Плейлисты"
             }
+
         }
         tabMediator.attach()
         val back = findViewById<ImageButton>(R.id.backButton)

@@ -35,7 +35,8 @@
         android:background="@color/tabl"
         app:tabTextColor="@color/black_white"
         app:tabIndicatorColor="@color/black_white"
-        app:tabSelectedTextColor="@color/black_white"/>
+        app:tabSelectedTextColor="@color/black_white"
+        app:tabTextAppearance="@style/NoCapsTabText"/>
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager2"
         android:layout_width="match_parent"
