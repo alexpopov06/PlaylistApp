@@ -16,5 +16,7 @@
     <color name="bottom_text_grey">#AEAFB4</color>
     <color name="DarkGrey">#1A1B22</color>
     <color name="whiteе">#FFFFFFFF</color>
+    <color name="white_black">#FF000000</color>
+    <color name="tabl">#1A1B22</color>
 
 </resources>

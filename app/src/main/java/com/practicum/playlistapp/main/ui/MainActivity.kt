@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.practicum.playlistapp.R
-import com.practicum.playlistapp.player.ui.MediatekActivity
+import com.practicum.playlistapp.media.MediaActivity
+import com.practicum.playlistapp.player.ui.PlayerActivity
 import com.practicum.playlistapp.search.ui.SearchActivity
 import com.practicum.playlistapp.settings.ui.SettingsActivity
 
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         val but2 = findViewById<Button>(R.id.pos2)
         val imageClickListener: View.OnClickListener = object : View.OnClickListener {
             override fun onClick(v: View?) {
-                val displayIntent = Intent(this@MainActivity, MediatekActivity::class.java)
+                val displayIntent = Intent(this@MainActivity, MediaActivity::class.java)
                 startActivity(displayIntent)
             }
         }

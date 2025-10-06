@@ -1,6 +1,6 @@
 package com.practicum.playlistapp.player.domain.api
 
-interface MediaPlayerInteractor {
+interface PlayerInteractor {
     fun preparePlayer(url: String)
     fun startPlayer()
     fun pausePlayer()

@@ -3,20 +3,17 @@ package com.practicum.playlistapp.player.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistapp.player.domain.api.MediaPlayerInteractor
+import com.practicum.playlistapp.player.domain.api.PlayerInteractor
 import com.practicum.playlistapp.search.domain.model.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
 
-class MediaPlayerViewModel(
-    private val mediaPlayerInteractor: MediaPlayerInteractor,
+class PlayerViewModel(
+    private val mediaPlayerInteractor: PlayerInteractor,
     private val track: Track
-) : ViewModel(), MediaPlayerInteractor.PlayerListener {
+) : ViewModel(), PlayerInteractor.PlayerListener {
 
     companion object {
         const val STATE_DEFAULT = 0

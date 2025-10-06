@@ -54,4 +54,9 @@
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:visibility">gone</item>
     </style>
+    <style name="NoCapsTabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textColor">@color/black_white</item>
+    </style>
 </resources>

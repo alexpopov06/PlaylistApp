@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.practicum.playlistapp.R
-import com.practicum.playlistapp.player.presentation.MediaPlayerViewModel
+import com.practicum.playlistapp.player.presentation.PlayerViewModel
 import com.practicum.playlistapp.search.domain.model.Track
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class MediatekActivity : AppCompatActivity() {
+class PlayerActivity : AppCompatActivity() {
 
 
     private lateinit var image: ImageView
@@ -46,7 +46,7 @@ class MediatekActivity : AppCompatActivity() {
     }
 
 
-    private val viewModel: MediaPlayerViewModel by viewModel {
+    private val viewModel: PlayerViewModel by viewModel {
         parametersOf(track)
     }
 
@@ -55,7 +55,7 @@ class MediatekActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_mediatek)
+        setContentView(R.layout.activity_player)
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.med)) { view, insets ->
@@ -86,17 +86,17 @@ class MediatekActivity : AppCompatActivity() {
 
         viewModel.observePlayerState().observe(this, Observer { state ->
             when (state) {
-                MediaPlayerViewModel.Companion.STATE_PLAYING -> {
+                PlayerViewModel.Companion.STATE_PLAYING -> {
                     playButton.setImageResource(R.drawable.pause)
                 }
-                MediaPlayerViewModel.Companion.STATE_PAUSED -> {
+                PlayerViewModel.Companion.STATE_PAUSED -> {
                     playButton.setImageResource(R.drawable.play)
                 }
-                MediaPlayerViewModel.Companion.STATE_PREPARED -> {
+                PlayerViewModel.Companion.STATE_PREPARED -> {
                     playButton.isEnabled = true
                     playButton.setImageResource(R.drawable.play)
                 }
-                MediaPlayerViewModel.Companion.STATE_DEFAULT -> {
+                PlayerViewModel.Companion.STATE_DEFAULT -> {
                     playButton.isEnabled = false
                 }
             }
@@ -160,7 +160,7 @@ class MediatekActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
 
-        if (viewModel.observePlayerState().value == MediaPlayerViewModel.Companion.STATE_PLAYING) {
+        if (viewModel.observePlayerState().value == PlayerViewModel.Companion.STATE_PLAYING) {
             viewModel.onPlayButtonClicked()
         }
     }
