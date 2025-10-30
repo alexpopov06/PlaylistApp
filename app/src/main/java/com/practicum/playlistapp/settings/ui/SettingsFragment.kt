@@ -1,25 +1,42 @@
 package com.practicum.playlistapp.settings.ui
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistapp.R
+import com.practicum.playlistapp.databinding.ActivitySettingsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
+    private lateinit var binding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = ActivitySettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings)) { view, insets ->
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupWindowInsets()
+        setupListeners()
+        setupThemeSwitcher()
+    }
+
+    private fun setupWindowInsets() {
+        val rootView = binding.root
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(
                 view.paddingLeft,
@@ -29,28 +46,28 @@ class SettingsActivity : AppCompatActivity() {
             )
             insets
         }
+    }
 
-        val back = findViewById<Button>(R.id.button_back)
-        back.setOnClickListener {
-            finish()
-        }
+    private fun setupListeners() {
 
-        val shareButton = findViewById<Button>(R.id.share)
+        val shareButton = binding.share
         shareButton.setOnClickListener {
             startActivity(viewModel.shareLink())
         }
 
-        val writeButton = findViewById<Button>(R.id.writeSup)
+        val writeButton = binding.writeSup
         writeButton.setOnClickListener {
             startActivity(viewModel.writeSupport())
         }
 
-        val agreeButton = findViewById<Button>(R.id.agreementButton)
+        val agreeButton = binding.agreementButton
         agreeButton.setOnClickListener {
             startActivity(viewModel.agreement())
         }
+    }
 
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.my_switch)
+    private fun setupThemeSwitcher() {
+        val themeSwitcher = binding.mySwitch
         themeSwitcher.isChecked = viewModel.isDarkTheme
 
         themeSwitcher.setOnCheckedChangeListener { switcher, checked ->

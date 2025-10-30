@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mediaFragment">
+    <fragment
+        android:id="@+id/searchFragment2"
+        android:name="com.practicum.playlistapp.search.ui.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment2_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/mediaFragment"
+        android:name="com.practicum.playlistapp.media.MediaFragment"
+        android:label="activity_media"
+        tools:layout="@layout/activity_media" />
+    <fragment
+        android:id="@+id/playerFragment"
+        android:name="com.practicum.playlistapp.player.ui.PlayerFragment"
+        android:label="activity_player"
+        tools:layout="@layout/activity_player" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.practicum.playlistapp.settings.ui.SettingsFragment"
+        android:label="activity_settings"
+        tools:layout="@layout/activity_settings" />
+</navigation>

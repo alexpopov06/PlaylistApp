@@ -22,23 +22,34 @@ class TrackAdapter(
     var tracks: List<Track>,
     private val addToHistoryUseCase: AddToHistoryUseCase,
     private val delayDebounce: () -> Boolean,
-    private val gson: Gson
+    private val gson: Gson,
+    private val onTrackClick: (Track) -> Unit
 ): RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
+        Log.d("TrackAdapter", "onCreateViewHolder called")
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
-        return TrackViewHolder(view, addToHistoryUseCase, delayDebounce, gson)
+        return TrackViewHolder(
+            view,
+            addToHistoryUseCase,
+            delayDebounce,
+            gson,
+            onTrackClick
+        )
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
+        Log.d("TrackAdapter", "onBindViewHolder position: $position, track: ${tracks[position].trackName}")
         holder.bind(tracks[position])
     }
 
     override fun getItemCount(): Int {
+        Log.d("TrackAdapter", "getItemCount: ${tracks.size}")
         return tracks.size
     }
 
     fun updateTracks(newTracks: List<Track>) {
+        Log.d("TrackAdapter", "updateTracks: ${newTracks.size} tracks")
         tracks = newTracks
         notifyDataSetChanged()
     }
@@ -47,7 +58,8 @@ class TrackAdapter(
         itemView: View,
         private val addToHistoryUseCase: AddToHistoryUseCase,
         private val delayDebounce: () -> Boolean,
-        private val gson: Gson //
+        private val gson: Gson,
+        private val onTrackClick: (Track) -> Unit
     ): RecyclerView.ViewHolder(itemView) {
 
         private val imageTrack: ImageView = itemView.findViewById(R.id.imageTrack)
@@ -57,6 +69,8 @@ class TrackAdapter(
         private val timeTrack = SimpleDateFormat("mm:ss", Locale.getDefault())
 
         fun bind(item: Track) {
+            Log.d("TrackAdapter", "Binding track: ${item.trackName}")
+
             trackName.text = item.trackName
             groupName.text = item.artistName
             val milliseconds = item.trackTimeMillis.toLong()
@@ -68,17 +82,33 @@ class TrackAdapter(
                 .into(imageTrack)
 
             itemView.setOnClickListener {
+                Log.d("TrackAdapter", "CLICK DETECTED on track: ${item.trackName}")
                 try {
-                    if (delayDebounce()) {
-                        addToHistoryUseCase.execute(item)
+                    val debounceResult = delayDebounce()
+                    Log.d("TrackAdapter", "Debounce result: $debounceResult")
 
-                        SearchActivity.moveToMediatek(itemView.context, item, gson)
+                    if (debounceResult) {
+                        Log.d("TrackAdapter", "Executing click logic")
+                        addToHistoryUseCase.execute(item)
+                        Log.d("TrackAdapter", "Calling onTrackClick callback")
+                        onTrackClick(item)
+                    } else {
+                        Log.d("TrackAdapter", "Click blocked by debounce")
                     }
                 } catch (e: Exception) {
+                    Log.e("TrackAdapter", "Error in click handler", e)
                     Toast.makeText(itemView.context, "Ошибка открытия трека", Toast.LENGTH_SHORT).show()
-                    Log.e("TrackAdapter", "Error opening track", e)
                 }
             }
+
+
+            itemView.isClickable = true
+            itemView.isFocusable = true
+            Log.d("TrackAdapter", "View clickable: ${itemView.isClickable}, focusable: ${itemView.isFocusable}")
         }
+    }
+
+    companion object {
+        private const val TAG = "TrackAdapter"
     }
 }

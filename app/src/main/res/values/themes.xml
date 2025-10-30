@@ -1,12 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.PlaylistApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#3772E7</item>
+        <item name="colorPrimaryVariant">#3772E7</item>
+        <item name="colorSecondary">#3772E7</item>
+        <item name="colorSecondaryVariant">#3772E7</item>
+
+        <!-- ваши существующие атрибуты -->
         <item name="android:colorBackground">@color/FonMain</item>
         <item name="android:windowBackground">@color/FonSet</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
         <item name="ColorIcon">@color/ColorIcons</item>
         <item name="clearButtonColor">@color/clearButtonColor</item>
     </style>
-
-
 </resources>
