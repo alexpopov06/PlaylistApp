@@ -28,6 +28,7 @@
         android:backgroundTint="@color/foneSearch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/arrow_back"
 />
     <ImageView
         android:id="@+id/imageTrack"
