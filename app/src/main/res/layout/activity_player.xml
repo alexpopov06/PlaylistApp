@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/foneSearch"
-    android:id="@+id/med">
+    android:id="@+id/med"
+    tools:context=".player.ui.PlayerFragment">
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/leftBorder"
         android:layout_width="wrap_content"
@@ -27,7 +28,8 @@
         android:backgroundTint="@color/foneSearch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/arrow_back" />
+        android:src="@drawable/arrow_back"
+/>
     <ImageView
         android:id="@+id/imageTrack"
         android:layout_marginTop="30dp"

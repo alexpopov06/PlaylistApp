@@ -1,17 +1,21 @@
 package com.practicum.playlistapp.player.ui
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.practicum.playlistapp.R
+import com.practicum.playlistapp.databinding.ActivityPlayerBinding
 import com.practicum.playlistapp.player.presentation.PlayerViewModel
 import com.practicum.playlistapp.search.domain.model.Track
 import org.koin.android.ext.android.inject
@@ -21,8 +25,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class PlayerActivity : AppCompatActivity() {
+class PlayerFragment : Fragment() {
 
+    private lateinit var binding: ActivityPlayerBinding
 
     private lateinit var image: ImageView
     private lateinit var artist: TextView
@@ -36,29 +41,41 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var time: TextView
     private lateinit var playButton: ImageView
 
-
     private val timeTrack = SimpleDateFormat("mm:ss", Locale.getDefault())
 
     private val gson: Gson by inject()
     private val track: Track by lazy {
-        val trackJson = intent.getStringExtra("TRACK_EXTRA")
+        val trackJson = arguments?.getString("TRACK_EXTRA") ?: ""
         gson.fromJson(trackJson, Track::class.java)
     }
-
 
     private val viewModel: PlayerViewModel by viewModel {
         parametersOf(track)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = ActivityPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_player)
+        setupWindowInsets()
+        initViews()
+        viewModel.preparePlayer()
+        setupObservers()
+        setupClickListeners()
+        updateUI(track)
+    }
 
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.med)) { view, insets ->
+    private fun setupWindowInsets() {
+        val rootView = binding.root
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(
                 view.paddingLeft,
@@ -68,23 +85,24 @@ class PlayerActivity : AppCompatActivity() {
             )
             insets
         }
+    }
 
-        initViews()
-
-
-
-
-
-        viewModel.preparePlayer()
-
-        setupObservers()
-        setupClickListeners()
-        updateUI(track)
+    private fun initViews() {
+        image = binding.imageTrack
+        artist = binding.ArtistName
+        trackName = binding.TrackName
+        longing = binding.longing2
+        year = binding.year2
+        type = binding.type2
+        country = binding.country2
+        albom = binding.albom2
+        back = binding.backButton
+        time = binding.time
+        playButton = binding.playButton
     }
 
     private fun setupObservers() {
-
-        viewModel.observePlayerState().observe(this, Observer { state ->
+        viewModel.observePlayerState().observe(viewLifecycleOwner, Observer { state ->
             when (state) {
                 PlayerViewModel.Companion.STATE_PLAYING -> {
                     playButton.setImageResource(R.drawable.pause)
@@ -102,29 +120,25 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
 
-
-        viewModel.observeProgressTime().observe(this, Observer { progressTime ->
+        viewModel.observeProgressTime().observe(viewLifecycleOwner, Observer { progressTime ->
             time.text = progressTime
         })
 
-
-        viewModel.observeTrack().observe(this, Observer { track ->
+        viewModel.observeTrack().observe(viewLifecycleOwner, Observer { track ->
             updateUI(track)
         })
     }
 
     private fun setupClickListeners() {
-
         back.setOnClickListener {
-            finish()
+
+            findNavController().navigateUp()
         }
 
-        // Кнопка play/pause
         playButton.setOnClickListener {
             viewModel.onPlayButtonClicked()
         }
     }
-
 
     private fun updateUI(track: Track) {
         artist.text = track.artistName
@@ -143,25 +157,20 @@ class PlayerActivity : AppCompatActivity() {
             .into(image)
     }
 
-    private fun initViews() {
-        image = findViewById(R.id.imageTrack)
-        artist = findViewById(R.id.ArtistName)
-        trackName = findViewById(R.id.TrackName)
-        longing = findViewById(R.id.longing2)
-        year = findViewById(R.id.year2)
-        type = findViewById(R.id.type2)
-        country = findViewById(R.id.country2)
-        albom = findViewById(R.id.albom2)
-        back = findViewById(R.id.backButton)
-        time = findViewById(R.id.time)
-        playButton = findViewById(R.id.playButton)
-    }
-
     override fun onPause() {
         super.onPause()
-
         if (viewModel.observePlayerState().value == PlayerViewModel.Companion.STATE_PLAYING) {
             viewModel.onPlayButtonClicked()
+        }
+    }
+
+    companion object {
+
+        fun createArgs(track: Track, gson: Gson): Bundle {
+            val args = Bundle()
+            val trackJson = gson.toJson(track)
+            args.putString("TRACK_EXTRA", trackJson)
+            return args
         }
     }
 }

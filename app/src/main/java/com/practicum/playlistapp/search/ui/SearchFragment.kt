@@ -1,34 +1,37 @@
 package com.practicum.playlistapp.search.ui
 
 import SearchState
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import com.practicum.playlistapp.R
-import com.practicum.playlistapp.player.ui.PlayerActivity
-import com.practicum.playlistapp.search.domain.model.Track
+import com.practicum.playlistapp.databinding.FragmentSearchBinding
+import com.practicum.playlistapp.player.ui.PlayerFragment
 import com.practicum.playlistapp.search.domain.usecase.AddToHistoryUseCase
 import com.practicum.playlistapp.search.presentation.TracksViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
+    private lateinit var binding: FragmentSearchBinding
 
     private lateinit var adapter: TrackAdapter
     private lateinit var inputEditText: EditText
@@ -46,7 +49,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var progBar: ProgressBar
     private lateinit var buttonBack: MaterialButton
 
-    // ✅ ИСПРАВЛЕНО: Все зависимости инжектируются
     private val viewModel: TracksViewModel by viewModel()
     private val addToHistoryUseCase: AddToHistoryUseCase by inject()
     private val gson: Gson by inject()
@@ -62,21 +64,22 @@ class SearchActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "SearchActivity"
-
-
-        fun moveToMediatek(context: Context, track: Track, gson: Gson) {
-            val intent = Intent(context, PlayerActivity::class.java)
-            val trackJson = gson.toJson(track)
-            intent.putExtra("TRACK_EXTRA", trackJson)
-            context.startActivity(intent)
-        }
+        private const val TAG = "SearchFragment"
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate")
-        setContentView(R.layout.activity_search)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated")
 
         setupWindowInsets()
         initViews()
@@ -85,13 +88,13 @@ class SearchActivity : AppCompatActivity() {
         setupInitialState()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         inputEditText.removeTextChangedListener(textWatcher)
     }
 
     private fun setupWindowInsets() {
-        val rootView = findViewById<View>(R.id.search)
+        val rootView = binding.root
         ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(
@@ -105,24 +108,23 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        inputEditText = findViewById(R.id.inputText)
-        rvTrack = findViewById(R.id.RecycleTracks)
-        emptyImage = findViewById(R.id.EmptyImage)
-        emptyText = findViewById(R.id.EmptyText)
-        nowifiImage = findViewById(R.id.NoWifiImage)
-        nowifiText1 = findViewById(R.id.NoWifiText1)
-        nowifiText2 = findViewById(R.id.NoWifiText2)
-        nowifiText3 = findViewById(R.id.NoWifiText3)
-        update = findViewById(R.id.update)
-        youSearch = findViewById(R.id.historySearch)
-        clearHistory = findViewById(R.id.clearHistory)
-        clearIcon = findViewById(R.id.clearIcon)
-        progBar = findViewById(R.id.progressBar)
-        buttonBack = findViewById(R.id.button_back)
+        inputEditText = binding.inputText
+        rvTrack = binding.RecycleTracks
+        emptyImage = binding.EmptyImage
+        emptyText = binding.EmptyText
+        nowifiImage = binding.NoWifiImage
+        nowifiText1 = binding.NoWifiText1
+        nowifiText2 = binding.NoWifiText2
+        nowifiText3 = binding.NoWifiText3
+        update = binding.update
+        youSearch = binding.historySearch
+        clearHistory = binding.clearHistory
+        clearIcon = binding.clearIcon
+        progBar = binding.progressBar
+
     }
 
     private fun setupRecyclerView() {
-        // ✅ ИСПРАВЛЕНО: Передаем инжектированный Gson в адаптер
         adapter = TrackAdapter(
             tracks = mutableListOf(),
             addToHistoryUseCase = addToHistoryUseCase,
@@ -130,10 +132,24 @@ class SearchActivity : AppCompatActivity() {
                 viewModel.delayDebounce()
                 true
             },
-            gson = gson
+            gson = gson,
+            onTrackClick = { track ->
+
+                Log.d("SearchFragment", "Navigating to player fragment")
+                try {
+                    findNavController().navigate(
+                        R.id.action_searchFragment2_to_playerFragment,
+                        PlayerFragment.createArgs(track, gson)
+                    )
+                    Log.d("SearchFragment", "Navigation successful")
+                } catch (e: Exception) {
+                    Log.e("SearchFragment", "Navigation failed", e)
+                    Toast.makeText(requireContext(), "Ошибка навигации: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
         )
 
-        rvTrack.layoutManager = LinearLayoutManager(this)
+        rvTrack.layoutManager = LinearLayoutManager(requireContext())
         rvTrack.adapter = adapter
     }
 
@@ -161,10 +177,7 @@ class SearchActivity : AppCompatActivity() {
             viewModel.clearHistory()
         }
 
-        buttonBack.setOnClickListener {
-            Log.d(TAG, "buttonBack clicked")
-            finish()
-        }
+
     }
 
     private fun setupInitialState() {
@@ -176,7 +189,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.observeState().observe(this) { state ->
+        viewModel.observeState().observe(viewLifecycleOwner) { state ->
             Log.d(TAG, "State observed: $state")
             render(state)
         }
@@ -185,6 +198,11 @@ class SearchActivity : AppCompatActivity() {
     private fun showClearButton(show: Boolean) {
         Log.d(TAG, "showClearButton: $show")
         clearIcon.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    // ✅ ДОБАВЛЕНО: Метод для debounce навигации (аналогично примеру с MoviesFragment)
+    private fun clickDebounce(): Boolean {
+        return viewModel.delayDebounce()
     }
 
     private fun render(state: SearchState) {

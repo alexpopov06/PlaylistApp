@@ -71,32 +71,51 @@ class TracksViewModel(private val tracksInteractor: TracksInteractor, private va
     private fun performSearch(query: String) {
         Log.d(TAG, "performSearch: starting search for '$query'")
 
-        tracksInteractor.searchTrack(query, object : TracksInteractor.TracksConsumer {
-            override fun consume(foundTracks: List<Track>, errorMessage: String?) {
-                Log.d(TAG, "performSearch: result - tracks=${foundTracks.size}, error=$errorMessage")
-                handler.post {
-                    handler.removeCallbacksAndMessages(null)
+        try {
+            tracksInteractor.searchTrack(query, object : TracksInteractor.TracksConsumer {
+                override fun consume(foundTracks: List<Track>, errorMessage: String?) {
+                    Log.d(TAG, "performSearch: result - tracks=${foundTracks.size}, error=$errorMessage")
 
-                    when {
-                        errorMessage != null -> {
-                            Log.e(TAG, "Search error: $errorMessage")
+                    // НЕМЕДЛЕННО обрабатываем ошибку в любом потоке
+                    if (errorMessage != null && errorMessage.contains("NETWORK_ERROR")) {
+                        Log.e(TAG, "Network error detected: $errorMessage")
+                        handler.post {
+                            handler.removeCallbacksAndMessages(null)
                             lastFailedSearchQuery = query
-                            renderState(SearchState.Error(showClearButton = true))
+                            renderState(SearchState.NoWifi)
                         }
-                        foundTracks.isEmpty() -> {
-                            Log.d(TAG, "Search empty results")
-                            lastFailedSearchQuery = query
-                            renderState(SearchState.Empty(showClearButton = true))
-                        }
-                        else -> {
-                            Log.d(TAG, "Search success: ${foundTracks.size} tracks found")
-                            lastFailedSearchQuery = null
-                            renderState(SearchState.Content(foundTracks, showClearButton = true))
+                        return
+                    }
+
+                    handler.post {
+                        handler.removeCallbacksAndMessages(null)
+
+                        when {
+                            errorMessage != null -> {
+                                Log.e(TAG, "Search error: $errorMessage")
+                                lastFailedSearchQuery = query
+                                renderState(SearchState.Error(showClearButton = true))
+                            }
+                            foundTracks.isEmpty() -> {
+                                Log.d(TAG, "Search empty results")
+                                lastFailedSearchQuery = query
+                                renderState(SearchState.Empty(showClearButton = true))
+                            }
+                            else -> {
+                                Log.d(TAG, "Search success: ${foundTracks.size} tracks found")
+                                lastFailedSearchQuery = null
+                                renderState(SearchState.Content(foundTracks, showClearButton = true))
+                            }
                         }
                     }
                 }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in performSearch", e)
+            handler.post {
+                renderState(SearchState.NoWifi) // Сразу показываем NoWifi при любой ошибке
             }
-        })
+        }
     }
 
     fun clearSearch() {
