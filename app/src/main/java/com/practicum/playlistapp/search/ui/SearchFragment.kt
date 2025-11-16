@@ -58,7 +58,7 @@ class SearchFragment : Fragment() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             val text = s?.toString() ?: ""
             showClearButton(text.isNotEmpty())
-            viewModel.searchDebounce(changedText = text)
+            viewModel.searchDebounce(text)
         }
         override fun afterTextChanged(s: Editable?) {}
     }
@@ -129,8 +129,7 @@ class SearchFragment : Fragment() {
             tracks = mutableListOf(),
             addToHistoryUseCase = addToHistoryUseCase,
             delayDebounce = {
-                viewModel.delayDebounce()
-                true
+                viewModel.clickDebounce()
             },
             gson = gson,
             onTrackClick = { track ->
@@ -162,10 +161,7 @@ class SearchFragment : Fragment() {
 
         inputEditText.addTextChangedListener(textWatcher)
 
-        inputEditText.setOnFocusChangeListener { _, hasFocus ->
-            val currentText = inputEditText.text.toString()
-            viewModel.onFocusChanged(hasFocus, currentText)
-        }
+
 
         update.setOnClickListener {
             Log.d(TAG, "update clicked")
@@ -200,10 +196,8 @@ class SearchFragment : Fragment() {
         clearIcon.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    // ✅ ДОБАВЛЕНО: Метод для debounce навигации (аналогично примеру с MoviesFragment)
-    private fun clickDebounce(): Boolean {
-        return viewModel.delayDebounce()
-    }
+
+
 
     private fun render(state: SearchState) {
         Log.d(TAG, "render: $state")

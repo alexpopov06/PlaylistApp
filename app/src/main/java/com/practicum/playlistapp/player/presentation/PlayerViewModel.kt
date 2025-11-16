@@ -3,12 +3,14 @@ package com.practicum.playlistapp.player.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistapp.player.domain.api.PlayerInteractor
 import com.practicum.playlistapp.search.domain.model.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
-import java.util.Timer
-import java.util.TimerTask
 
 class PlayerViewModel(
     private val mediaPlayerInteractor: PlayerInteractor,
@@ -20,7 +22,6 @@ class PlayerViewModel(
         const val STATE_PREPARED = 1
         const val STATE_PLAYING = 2
         const val STATE_PAUSED = 3
-
     }
 
     private val playerStateLiveData = MutableLiveData(STATE_DEFAULT)
@@ -33,7 +34,9 @@ class PlayerViewModel(
     fun observeTrack(): LiveData<Track> = trackLiveData
 
     private val timeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-    private var timer: Timer? = null
+
+
+    private var timerJob: Job? = null
 
     init {
         mediaPlayerInteractor.setListener(this)
@@ -45,35 +48,40 @@ class PlayerViewModel(
         mediaPlayerInteractor.releasePlayer()
     }
 
+    fun preparePlayer() {
+        mediaPlayerInteractor.preparePlayer(track.previewUrl)
+    }
+
     fun onPlayButtonClicked() {
         mediaPlayerInteractor.playbackControl()
     }
 
-     fun preparePlayer() {
-        mediaPlayerInteractor.preparePlayer(track.previewUrl)
-    }
 
     private fun startTimer() {
         stopTimer()
-        timer = Timer()
-        timer?.schedule(object : TimerTask() {
-            override fun run() {
-                updateProgress()
+
+        timerJob = viewModelScope.launch {
+            while (true) {
+                val pos = mediaPlayerInteractor.getCurrentPosition()
+
+                progressTimeLiveData.postValue(timeFormat.format(pos))
+
+                delay(300L)
+
+                if (playerStateLiveData.value != STATE_PLAYING) break
             }
-        }, 0, 200)
+        }
     }
+
+
 
     private fun stopTimer() {
-        timer?.cancel()
-        timer = null
+        timerJob?.cancel()
+        timerJob = null
     }
 
-    private fun updateProgress() {
-        val position = mediaPlayerInteractor.getCurrentPosition()
-        progressTimeLiveData.postValue(timeFormat.format(position))
-    }
 
-    // Реализация PlayerListener
+
     override fun onPrepared() {
         playerStateLiveData.postValue(STATE_PREPARED)
     }
