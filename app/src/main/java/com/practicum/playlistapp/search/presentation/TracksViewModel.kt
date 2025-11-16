@@ -1,186 +1,137 @@
-
 package com.practicum.playlistapp.search.presentation
 
 import SearchState
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.*
 import com.practicum.playlistapp.search.domain.api.TracksInteractor
 import com.practicum.playlistapp.search.domain.model.Track
 import com.practicum.playlistapp.search.domain.usecase.AddToHistoryUseCase
 import com.practicum.playlistapp.search.domain.usecase.ClearHistoryUseCase
 import com.practicum.playlistapp.search.domain.usecase.GetHistoryUseCase
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-class TracksViewModel(private val tracksInteractor: TracksInteractor, private val addToHistoryUseCase: AddToHistoryUseCase,
-                      private val getHistoryUseCase: GetHistoryUseCase, // ← ДОБАВЛЯЕМ зависимость
-                      private val clearHistoryUseCase: ClearHistoryUseCase) : ViewModel() {
+class TracksViewModel(
+    private val tracksInteractor: TracksInteractor,
+    private val addToHistoryUseCase: AddToHistoryUseCase,
+    private val getHistoryUseCase: GetHistoryUseCase,
+    private val clearHistoryUseCase: ClearHistoryUseCase
+) : ViewModel() {
 
-    private var lastFailedSearchQuery: String? = null
-    private var latestSearchText: String? = null
-    private var isClickable = true
-    private val handler = Handler(Looper.getMainLooper())
-    private val SEARCH_DEBOUNCE_DELAY = 500L
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 500L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val TAG = "TracksViewModel"
+    }
 
     private val stateLiveData = MutableLiveData<SearchState>()
     fun observeState(): LiveData<SearchState> = stateLiveData
 
-    companion object {
-        const val CLICK_DEBOUNCE_DELAY = 1000L
-        private const val TAG = "TracksViewModel"
+    private var latestSearchText: String? = null
+    private var lastFailedSearchQuery: String? = null
 
+    private var searchJob: Job? = null
+    private var clickJob: Job? = null
+    private var isClickable = true
 
-    }
+    fun searchDebounce(text: String) {
+        Log.d(TAG, "searchDebounce: '$text'")
 
-
-    fun searchDebounce(changedText: String) {
-        Log.d(TAG, "searchDebounce: text='$changedText', latest='$latestSearchText'")
-
-        if (changedText.isEmpty()) {
-            Log.d(TAG, "searchDebounce: empty text, showing history")
+        if (text.isEmpty()) {
             showSearchHistory()
             return
         }
 
-        if (latestSearchText == changedText) {
-            Log.d(TAG, "searchDebounce: same text, skipping")
-            return
+        if (latestSearchText == text) return
+        latestSearchText = text
+
+        searchJob?.cancel()
+
+        stateLiveData.postValue(SearchState.Loading)
+
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
+            runSearch(text)
         }
-        latestSearchText = changedText
-
-        handler.removeCallbacksAndMessages(null)
-
-        handler.postDelayed({
-            renderState(SearchState.Loading)
-        }, 300L)
-
-        val searchRunnable = Runnable {
-            Log.d(TAG, "Debounced search executing for: '$changedText'")
-            performSearch(changedText)
-        }
-
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-        Log.d(TAG, "searchDebounce: scheduled search in $SEARCH_DEBOUNCE_DELAY ms")
     }
 
-    private fun performSearch(query: String) {
-        Log.d(TAG, "performSearch: starting search for '$query'")
+    // ---------------------------------------------------------
+    // 🔹 ДЕБО УНС КЛИКА
+    // ---------------------------------------------------------
+    fun clickDebounce(): Boolean {
+        if (!isClickable) return false
 
-        try {
-            tracksInteractor.searchTrack(query, object : TracksInteractor.TracksConsumer {
-                override fun consume(foundTracks: List<Track>, errorMessage: String?) {
-                    Log.d(TAG, "performSearch: result - tracks=${foundTracks.size}, error=$errorMessage")
+        isClickable = false
 
-                    // НЕМЕДЛЕННО обрабатываем ошибку в любом потоке
-                    if (errorMessage != null && errorMessage.contains("NETWORK_ERROR")) {
-                        Log.e(TAG, "Network error detected: $errorMessage")
-                        handler.post {
-                            handler.removeCallbacksAndMessages(null)
-                            lastFailedSearchQuery = query
-                            renderState(SearchState.NoWifi)
-                        }
-                        return
+        clickJob?.cancel()
+        clickJob = viewModelScope.launch {
+            delay(CLICK_DEBOUNCE_DELAY)
+            isClickable = true
+        }
+        return true
+    }
+
+
+    private fun runSearch(query: String) {
+        Log.d(TAG, "runSearch(): '$query'")
+
+        viewModelScope.launch {
+            tracksInteractor.searchTrack(query).collectLatest { (tracks, error) ->
+
+                when {
+                    error?.contains("NETWORK_ERROR") == true -> {
+                        lastFailedSearchQuery = query
+                        renderState(SearchState.NoWifi)
                     }
 
-                    handler.post {
-                        handler.removeCallbacksAndMessages(null)
+                    error != null -> {
+                        lastFailedSearchQuery = query
+                        renderState(SearchState.Error(showClearButton = true))
+                    }
 
-                        when {
-                            errorMessage != null -> {
-                                Log.e(TAG, "Search error: $errorMessage")
-                                lastFailedSearchQuery = query
-                                renderState(SearchState.Error(showClearButton = true))
-                            }
-                            foundTracks.isEmpty() -> {
-                                Log.d(TAG, "Search empty results")
-                                lastFailedSearchQuery = query
-                                renderState(SearchState.Empty(showClearButton = true))
-                            }
-                            else -> {
-                                Log.d(TAG, "Search success: ${foundTracks.size} tracks found")
-                                lastFailedSearchQuery = null
-                                renderState(SearchState.Content(foundTracks, showClearButton = true))
-                            }
-                        }
+                    tracks.isNullOrEmpty() -> {
+                        lastFailedSearchQuery = query
+                        renderState(SearchState.Empty(showClearButton = true))
+                    }
+
+                    else -> {
+                        lastFailedSearchQuery = null
+                        addToHistoryUseCase.execute(tracks.first())
+                        renderState(SearchState.Content(tracks, showClearButton = true))
                     }
                 }
-            })
-        } catch (e: Exception) {
-            Log.e(TAG, "Error in performSearch", e)
-            handler.post {
-                renderState(SearchState.NoWifi) // Сразу показываем NoWifi при любой ошибке
             }
         }
     }
 
+
+
     fun clearSearch() {
-        Log.d(TAG, "clearSearch")
-        handler.removeCallbacksAndMessages(null)
+        searchJob?.cancel()
         latestSearchText = ""
         showSearchHistory()
     }
 
-
     fun onUpdateClicked() {
-        Log.d(TAG, "onUpdateClicked: lastFailedQuery='$lastFailedSearchQuery'")
-        handler.removeCallbacksAndMessages(null)
-        renderState(SearchState.Loading)
-        lastFailedSearchQuery?.let { performSearch(it) }
+        lastFailedSearchQuery?.let { runSearch(it) }
     }
 
     fun clearHistory() {
-        Log.d(TAG, "clearHistory")
-        handler.removeCallbacksAndMessages(null)
         clearHistoryUseCase.execute()
         renderState(SearchState.Idle)
     }
 
     fun showSearchHistory() {
-        Log.d(TAG, "showSearchHistory")
-        handler.removeCallbacksAndMessages(null)
-        val historyTracks = getHistoryUseCase.execute()
-        Log.d(TAG, "History tracks count: ${historyTracks.size}")
-        if (historyTracks.isEmpty()) {
+        val history = getHistoryUseCase.execute()
+        if (history.isEmpty())
             renderState(SearchState.Idle)
-        } else {
-            renderState(SearchState.History(historyTracks))
-        }
+        else
+            renderState(SearchState.History(history))
     }
-
-
-    fun delayDebounce(): Boolean {
-        val current = isClickable
-        Log.d(TAG, "delayDebounce: current=$current")
-        if (isClickable) {
-            isClickable = false
-            handler.postDelayed({
-                isClickable = true
-                Log.d(TAG, "delayDebounce: reset to clickable")
-            }, CLICK_DEBOUNCE_DELAY)
-        }
-        return current
-    }
-
-
-    fun onFocusChanged(hasFocus: Boolean, currentText: String) {
-        Log.d(TAG, "onFocusChanged: hasFocus=$hasFocus, text='$currentText'")
-        handler.removeCallbacksAndMessages(null)
-        if (hasFocus && currentText.isEmpty()) showSearchHistory()
-    }
-
 
     private fun renderState(state: SearchState) {
-        Log.d(TAG, "renderState: $state")
         stateLiveData.postValue(state)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        handler.removeCallbacksAndMessages(null)
     }
 }

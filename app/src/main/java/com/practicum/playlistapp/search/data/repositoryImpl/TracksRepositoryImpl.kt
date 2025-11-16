@@ -6,52 +6,23 @@ import com.practicum.playlistapp.search.data.dto.SearchTracksRequest
 import com.practicum.playlistapp.search.data.dto.SearchTracksResponse
 import com.practicum.playlistapp.search.domain.model.Track
 import com.practicum.playlistapp.search.domain.repository.TracksRepository
-import okio.Timeout
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class TracksRepositoryImpl(
     private val networkClient: NetworkClient
 ) : TracksRepository {
 
-    override fun searchTrack(expression: String): Resource<List<Track>> {
-        val response = networkClient.doRequest(SearchTracksRequest(expression))
-        return when (response.resultCode){
-            -1 ->{
-                Resource.Error("Проверьте подключение к интернету")
-            }
-            200 -> {
-                val tracks = (response as SearchTracksResponse).results.map { dto ->
-                    Track(
-                        trackName = dto.trackName,
-                        artistName = dto.artistName,
-                        trackTimeMillis = dto.trackTimeMillis,
-                        artworkUrl100 = dto.artworkUrl100,
-                        trackId = dto.trackId?.toString(),
-                        collectionName = dto.collectionName,
-                        releaseDate = dto.releaseDate,
-                        primaryGenreName = dto.primaryGenreName,
-                        country = dto.country,
-                        previewUrl = dto.previewUrl
-                    )
-                }
-                Resource.Success(tracks)
-            }else -> {
-                Resource.Error("Ошибка сервера")
-            }
+    override fun searchTrack(expression: String): Flow<Resource<List<Track>>> = flow {
 
+        try {
+            val response = networkClient.doRequest(SearchTracksRequest(expression))
 
-        }
-    }
+            when (response.resultCode) {
 
+                -1 -> emit(Resource.Error("Проверьте подключение к интернету"))
 
-
-    override fun search(query: String): Call<List<Track>> {
-        return object : Call<List<Track>> {
-            override fun execute(): Response<List<Track>> {
-                val response = networkClient.doRequest(SearchTracksRequest(query))
-                return if (response.resultCode == 200) {
+                200 -> {
                     val tracks = (response as SearchTracksResponse).results.map { dto ->
                         Track(
                             trackName = dto.trackName,
@@ -66,30 +37,14 @@ class TracksRepositoryImpl(
                             previewUrl = dto.previewUrl
                         )
                     }
-                    Response.success(tracks)
-                } else {
-                    Response.error(400, null)
+
+                    emit(Resource.Success(tracks))
                 }
+
+                else -> emit(Resource.Error("Ошибка сервера"))
             }
-
-
-            override fun enqueue(callback: Callback<List<Track>>) {
-                try {
-                    callback.onResponse(this, execute())
-                } catch (e: Exception) {
-                    callback.onFailure(this, e)
-                }
-            }
-
-            override fun isExecuted() = false
-            override fun cancel() {}
-            override fun isCanceled() = false
-            override fun clone(): Call<List<Track>> = this
-            override fun request() = null
-            override fun timeout(): Timeout {
-                return Timeout.NONE
-
-            }
+        } catch (e: Exception) {
+            emit(Resource.Error("NETWORK_ERROR: ${e.message}"))
         }
     }
 }
