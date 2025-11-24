@@ -30,4 +30,6 @@
         android:name="com.practicum.playlistapp.settings.ui.SettingsFragment"
         android:label="activity_settings"
         tools:layout="@layout/activity_settings" />
+
+
 </navigation>
