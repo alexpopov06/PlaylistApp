@@ -12,24 +12,28 @@ import org.koin.dsl.module
 
 val playerModule = module {
 
+
     factory { MediaPlayer() }
+
 
     single<PlayerInteractor.PlayerController> {
         PlayerRepository(mediaPlayerProvider = { get() })
     }
 
+
     single<PlayerInteractor> {
-        PlayerInteractorImpl(
-            playerController = get()
-        )
+        PlayerInteractorImpl(playerController = get())
     }
+
 
     viewModel { (track: Track) ->
         PlayerViewModel(
             mediaPlayerInteractor = get(),
+            favoriteTracksInteractor = get(),
             track = track
         )
     }
+
 
     single { Gson() }
 }
