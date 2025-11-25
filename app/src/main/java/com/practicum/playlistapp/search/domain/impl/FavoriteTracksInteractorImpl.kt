@@ -21,4 +21,8 @@ class FavoriteTracksInteractorImpl(
     override suspend fun remove(track: TrackEntity) {
         repository.removeFromMedia(track)
     }
+    override suspend fun isFavorite(trackId: String): Boolean {
+        return repository.isFavorite(trackId)
+    }
+
 }

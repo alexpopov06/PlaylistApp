@@ -1,9 +1,6 @@
 package com.practicum.playlistapp.player.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.practicum.playlistapp.player.domain.api.PlayerInteractor
 import com.practicum.playlistapp.search.domain.db.FavoriteTracksInteractor
 import com.practicum.playlistapp.search.data.db.TrackEntity
@@ -27,7 +24,6 @@ class PlayerViewModel(
         const val STATE_PAUSED = 3
     }
 
-
     private val playerStateLiveData = MutableLiveData(STATE_DEFAULT)
     fun observePlayerState(): LiveData<Int> = playerStateLiveData
 
@@ -37,12 +33,21 @@ class PlayerViewModel(
     private val trackLiveData = MutableLiveData(track)
     fun observeTrack(): LiveData<Track> = trackLiveData
 
-    private val timeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
+    private val isFavoriteLiveData = MutableLiveData(track.isFavorite)
+    fun observeIsFavorite(): LiveData<Boolean> = isFavoriteLiveData
 
+    private val timeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
     private var timerJob: Job? = null
 
     init {
         mediaPlayerInteractor.setListener(this)
+
+        viewModelScope.launch {
+            val isFav = favoriteTracksInteractor.isFavorite(track.trackId ?: "")
+            track.isFavorite = isFav
+            isFavoriteLiveData.postValue(isFav)
+            trackLiveData.postValue(track)
+        }
     }
 
     override fun onCleared() {
@@ -61,16 +66,10 @@ class PlayerViewModel(
 
     private fun startTimer() {
         stopTimer()
-
         timerJob = viewModelScope.launch {
-            while (true) {
-                val pos = mediaPlayerInteractor.getCurrentPosition()
-
-                progressTimeLiveData.postValue(timeFormat.format(pos))
-
-                delay(300L)
-
-                if (playerStateLiveData.value != STATE_PLAYING) break
+            while (playerStateLiveData.value == STATE_PLAYING) {
+                progressTimeLiveData.postValue(timeFormat.format(mediaPlayerInteractor.getCurrentPosition()))
+                delay(300)
             }
         }
     }
@@ -100,36 +99,23 @@ class PlayerViewModel(
         stopTimer()
     }
 
-
-
-    private val isFavoriteLiveData = MutableLiveData(track.isFavorite)
-    fun observeIsFavorite(): LiveData<Boolean> = isFavoriteLiveData
-
     fun onFavoriteClicked() {
         viewModelScope.launch {
-            android.util.Log.d("FAV_DEBUG", "onFavoriteClicked: isFavorite(before) = ${track.isFavorite}, id=${track.trackId}")
-
             if (track.isFavorite) {
-                android.util.Log.d("FAV_DEBUG", "onFavoriteClicked: remove FROM favorites")
                 favoriteTracksInteractor.remove(track.toEntity())
                 track.isFavorite = false
             } else {
-                android.util.Log.d("FAV_DEBUG", "onFavoriteClicked: ADD to favorites, entityId=${track.trackId ?: ""}")
                 favoriteTracksInteractor.add(track.toEntity())
                 track.isFavorite = true
             }
-
-            android.util.Log.d("FAV_DEBUG", "onFavoriteClicked: isFavorite(after) = ${track.isFavorite}")
 
             isFavoriteLiveData.postValue(track.isFavorite)
             trackLiveData.postValue(track)
         }
     }
 
-
-
     private fun Track.toEntity(): TrackEntity {
-        val entity = TrackEntity(
+        return TrackEntity(
             id = this.trackId ?: "",
             trackName = this.trackName,
             artistName = this.artistName,
@@ -143,8 +129,5 @@ class PlayerViewModel(
             previewUrl = this.previewUrl,
             addedAt = System.currentTimeMillis()
         )
-        android.util.Log.d("FAV_DEBUG", "Track.toEntity: id=${entity.id}, trackId=${this.trackId}, name=${entity.trackName}")
-        return entity
     }
-
 }

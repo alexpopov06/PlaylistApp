@@ -7,9 +7,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
-
 @Dao
 interface TrackDao {
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTrack(track: TrackEntity)
 
@@ -17,10 +17,8 @@ interface TrackDao {
     suspend fun deleteTrack(track: TrackEntity)
 
     @Query("SELECT * FROM track_table")
-     fun getListOfTracks():  Flow<List<TrackEntity>>
+    fun getListOfTracks(): Flow<List<TrackEntity>>
 
     @Query("SELECT id FROM track_table")
-    suspend fun getTracksId():List<String>
-
-
+    suspend fun getTracksId(): List<String>
 }

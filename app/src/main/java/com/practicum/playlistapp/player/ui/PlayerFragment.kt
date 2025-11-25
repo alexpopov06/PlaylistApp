@@ -127,7 +127,7 @@ class PlayerFragment : Fragment() {
 
         viewModel.observeIsFavorite().observe(viewLifecycleOwner) { isFavorite ->
             favoriteButton.setImageResource(
-                if (isFavorite) R.drawable.favselected
+                if (isFavorite) R.drawable.favnight
                 else R.drawable.favbutton
             )
         }
