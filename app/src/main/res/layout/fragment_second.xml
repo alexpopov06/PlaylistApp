@@ -12,57 +12,38 @@
         android:id="@+id/newPlaylistButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:text="Новый плейлист"
-        android:textAllCaps="false"
         android:textColor="@color/white_black"
         android:fontFamily="@font/ys_display_medium"
         android:backgroundTint="@color/black_white"
         app:cornerRadius="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/playlistsRecycler"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_playlist"
-        tools:visibility="visible" />
-
+        android:layout_marginTop="128dp"
+        android:textAllCaps="false"/>
 
     <ImageView
         android:id="@+id/emptyImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/nothingfind"
-        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton"
-        app:layout_constraintBottom_toTopOf="@id/emptyText"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        android:layout_marginTop="32dp" />
+        android:layout_marginTop="210dp" />
 
     <TextView
         android:id="@+id/emptyText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:text="Вы не создали ни одного плейлиста"
         android:textSize="19sp"
         android:textColor="@color/black_white"
         android:fontFamily="@font/ys_display_medium"
-        app:layout_constraintTop_toBottomOf="@id/emptyImage"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emptyImage"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

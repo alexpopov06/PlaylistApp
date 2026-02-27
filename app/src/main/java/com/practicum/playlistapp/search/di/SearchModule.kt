@@ -8,7 +8,6 @@ import com.google.gson.Gson
 import com.practicum.playlistapp.player.presentation.PlayerViewModel
 import com.practicum.playlistapp.search.data.NetworkClient
 import com.practicum.playlistapp.search.data.db.AppDatabase
-import com.practicum.playlistapp.search.data.db.DatabaseMigrations
 import com.practicum.playlistapp.search.data.network.RetrofitNetworkClient
 import com.practicum.playlistapp.search.data.repositoryImpl.FavoriteTracksRepositoryImpl
 import com.practicum.playlistapp.search.data.repositoryImpl.HistoryRepositoryImpl
@@ -68,7 +67,6 @@ val searchModule = module {
     single { ThemePreferences(androidContext()) }
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
-            .addMigrations(DatabaseMigrations.MIGRATION_2_3, DatabaseMigrations.MIGRATION_3_4)
             .build()
     }
     single<FavoriteTracksRepository> {
@@ -83,7 +81,6 @@ val searchModule = module {
         PlayerViewModel(
             mediaPlayerInteractor = get(),
             favoriteTracksInteractor = get(),
-            playlistsInteractor = get(),
             track = track
         )
     }

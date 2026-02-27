@@ -7,15 +7,12 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.practicum.playlistapp.R
 import com.practicum.playlistapp.databinding.ActivityPlayerBinding
@@ -44,10 +41,6 @@ class PlayerFragment : Fragment() {
     private lateinit var time: TextView
     private lateinit var playButton: ImageView
     private lateinit var favoriteButton: ImageView
-    private lateinit var plusButton: ImageView
-
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
-    private lateinit var bottomSheetAdapter: BottomSheetPlaylistsAdapter
 
     private val timeTrack = SimpleDateFormat("mm:ss", Locale.getDefault())
 
@@ -75,7 +68,6 @@ class PlayerFragment : Fragment() {
 
         setupWindowInsets()
         initViews()
-        setupBottomSheet()
         viewModel.preparePlayer()
         setupObservers()
         setupClickListeners()
@@ -109,44 +101,6 @@ class PlayerFragment : Fragment() {
         time = binding.time
         playButton = binding.playButton
         favoriteButton = binding.favButton
-        plusButton = binding.plusButton
-    }
-
-    private fun setupBottomSheet() {
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
-            state = BottomSheetBehavior.STATE_HIDDEN
-        }
-
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        binding.overlay.visibility = View.GONE
-                    }
-                    else -> {
-                        binding.overlay.visibility = View.VISIBLE
-                    }
-                }
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-        })
-
-        bottomSheetAdapter = BottomSheetPlaylistsAdapter(emptyList()) { playlist ->
-            viewModel.onPlaylistSelected(playlist)
-        }
-        binding.playlistsBottomSheetRecycler.layoutManager =
-            LinearLayoutManager(requireContext())
-        binding.playlistsBottomSheetRecycler.adapter = bottomSheetAdapter
-
-        binding.newPlaylistButtonBottomSheet.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            findNavController().navigate(R.id.action_playerFragment_to_createPlaylistFragment)
-        }
-
-        binding.overlay.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        }
     }
 
     private fun setupObservers() {
@@ -177,17 +131,6 @@ class PlayerFragment : Fragment() {
                 else R.drawable.favbutton
             )
         }
-
-        viewModel.playlists.observe(viewLifecycleOwner) { playlists ->
-            bottomSheetAdapter.submitList(playlists)
-        }
-
-        viewModel.observePlaylistAddStatus().observe(viewLifecycleOwner) { result ->
-            Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
-            if (result.added) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-        }
     }
 
     private fun setupClickListeners() {
@@ -202,10 +145,6 @@ class PlayerFragment : Fragment() {
 
         favoriteButton.setOnClickListener {
             viewModel.onFavoriteClicked()
-        }
-
-        plusButton.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 

@@ -1,13 +1,7 @@
 package com.practicum.playlistapp.player.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.practicum.playlistapp.player.domain.api.PlayerInteractor
-import com.practicum.playlistapp.playlist.domain.api.PlaylistsInteractor
-import com.practicum.playlistapp.playlist.domain.model.Playlist
 import com.practicum.playlistapp.search.domain.db.FavoriteTracksInteractor
 import com.practicum.playlistapp.search.data.db.TrackEntity
 import com.practicum.playlistapp.search.domain.model.Track
@@ -17,15 +11,9 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-data class PlaylistAddResult(
-    val message: String,
-    val added: Boolean
-)
-
 class PlayerViewModel(
     private val mediaPlayerInteractor: PlayerInteractor,
     private val favoriteTracksInteractor: FavoriteTracksInteractor,
-    private val playlistsInteractor: PlaylistsInteractor,
     private val track: Track
 ) : ViewModel(), PlayerInteractor.PlayerListener {
 
@@ -47,11 +35,6 @@ class PlayerViewModel(
 
     private val isFavoriteLiveData = MutableLiveData(track.isFavorite)
     fun observeIsFavorite(): LiveData<Boolean> = isFavoriteLiveData
-
-    val playlists: LiveData<List<Playlist>> = playlistsInteractor.getPlaylists().asLiveData()
-
-    private val playlistAddStatusLiveData = MutableLiveData<PlaylistAddResult>()
-    fun observePlaylistAddStatus(): LiveData<PlaylistAddResult> = playlistAddStatusLiveData
 
     private val timeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
     private var timerJob: Job? = null
@@ -128,31 +111,6 @@ class PlayerViewModel(
 
             isFavoriteLiveData.postValue(track.isFavorite)
             trackLiveData.postValue(track)
-        }
-    }
-
-    fun onPlaylistSelected(playlist: Playlist) {
-        val id = track.trackId ?: ""
-        if (id.isBlank()) return
-
-        if (playlist.trackIds.contains(id)) {
-            playlistAddStatusLiveData.postValue(
-                PlaylistAddResult(
-                    message = "Трек уже добавлен в плейлист ${playlist.name}",
-                    added = false
-                )
-            )
-            return
-        }
-
-        viewModelScope.launch {
-            playlistsInteractor.addTrackToPlaylist(track, playlist)
-            playlistAddStatusLiveData.postValue(
-                PlaylistAddResult(
-                    message = "Добавлено в плейлист ${playlist.name}",
-                    added = true
-                )
-            )
         }
     }
 
