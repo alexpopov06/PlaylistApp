@@ -1,10 +1,9 @@
 package com.practicum.playlistapp.player.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.practicum.playlistapp.player.domain.api.PlayerInteractor
+import com.practicum.playlistapp.search.domain.db.FavoriteTracksInteractor
+import com.practicum.playlistapp.search.data.db.TrackEntity
 import com.practicum.playlistapp.search.domain.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -14,6 +13,7 @@ import java.util.Locale
 
 class PlayerViewModel(
     private val mediaPlayerInteractor: PlayerInteractor,
+    private val favoriteTracksInteractor: FavoriteTracksInteractor,
     private val track: Track
 ) : ViewModel(), PlayerInteractor.PlayerListener {
 
@@ -33,13 +33,21 @@ class PlayerViewModel(
     private val trackLiveData = MutableLiveData(track)
     fun observeTrack(): LiveData<Track> = trackLiveData
 
+    private val isFavoriteLiveData = MutableLiveData(track.isFavorite)
+    fun observeIsFavorite(): LiveData<Boolean> = isFavoriteLiveData
+
     private val timeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-
-
     private var timerJob: Job? = null
 
     init {
         mediaPlayerInteractor.setListener(this)
+
+        viewModelScope.launch {
+            val isFav = favoriteTracksInteractor.isFavorite(track.trackId ?: "")
+            track.isFavorite = isFav
+            isFavoriteLiveData.postValue(isFav)
+            trackLiveData.postValue(track)
+        }
     }
 
     override fun onCleared() {
@@ -56,31 +64,20 @@ class PlayerViewModel(
         mediaPlayerInteractor.playbackControl()
     }
 
-
     private fun startTimer() {
         stopTimer()
-
         timerJob = viewModelScope.launch {
-            while (true) {
-                val pos = mediaPlayerInteractor.getCurrentPosition()
-
-                progressTimeLiveData.postValue(timeFormat.format(pos))
-
-                delay(300L)
-
-                if (playerStateLiveData.value != STATE_PLAYING) break
+            while (playerStateLiveData.value == STATE_PLAYING) {
+                progressTimeLiveData.postValue(timeFormat.format(mediaPlayerInteractor.getCurrentPosition()))
+                delay(300)
             }
         }
     }
-
-
 
     private fun stopTimer() {
         timerJob?.cancel()
         timerJob = null
     }
-
-
 
     override fun onPrepared() {
         playerStateLiveData.postValue(STATE_PREPARED)
@@ -100,5 +97,37 @@ class PlayerViewModel(
     override fun pausingPlayer() {
         playerStateLiveData.postValue(STATE_PAUSED)
         stopTimer()
+    }
+
+    fun onFavoriteClicked() {
+        viewModelScope.launch {
+            if (track.isFavorite) {
+                favoriteTracksInteractor.remove(track.toEntity())
+                track.isFavorite = false
+            } else {
+                favoriteTracksInteractor.add(track.toEntity())
+                track.isFavorite = true
+            }
+
+            isFavoriteLiveData.postValue(track.isFavorite)
+            trackLiveData.postValue(track)
+        }
+    }
+
+    private fun Track.toEntity(): TrackEntity {
+        return TrackEntity(
+            id = this.trackId ?: "",
+            trackName = this.trackName,
+            artistName = this.artistName,
+            trackTimeMillis = this.trackTimeMillis,
+            artworkUrl100 = this.artworkUrl100,
+            trackId = this.trackId,
+            collectionName = this.collectionName,
+            releaseDate = this.releaseDate,
+            primaryGenreName = this.primaryGenreName,
+            country = this.country,
+            previewUrl = this.previewUrl,
+            addedAt = System.currentTimeMillis()
+        )
     }
 }

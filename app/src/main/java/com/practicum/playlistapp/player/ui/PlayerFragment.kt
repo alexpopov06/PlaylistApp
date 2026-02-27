@@ -40,6 +40,7 @@ class PlayerFragment : Fragment() {
     private lateinit var back: ImageButton
     private lateinit var time: TextView
     private lateinit var playButton: ImageView
+    private lateinit var favoriteButton: ImageView
 
     private val timeTrack = SimpleDateFormat("mm:ss", Locale.getDefault())
 
@@ -99,44 +100,51 @@ class PlayerFragment : Fragment() {
         back = binding.backButton
         time = binding.time
         playButton = binding.playButton
+        favoriteButton = binding.favButton
     }
 
     private fun setupObservers() {
         viewModel.observePlayerState().observe(viewLifecycleOwner, Observer { state ->
             when (state) {
-                PlayerViewModel.Companion.STATE_PLAYING -> {
-                    playButton.setImageResource(R.drawable.pause)
-                }
-                PlayerViewModel.Companion.STATE_PAUSED -> {
-                    playButton.setImageResource(R.drawable.play)
-                }
-                PlayerViewModel.Companion.STATE_PREPARED -> {
+                PlayerViewModel.STATE_PLAYING -> playButton.setImageResource(R.drawable.pause)
+                PlayerViewModel.STATE_PAUSED -> playButton.setImageResource(R.drawable.play)
+                PlayerViewModel.STATE_PREPARED -> {
                     playButton.isEnabled = true
                     playButton.setImageResource(R.drawable.play)
                 }
-                PlayerViewModel.Companion.STATE_DEFAULT -> {
-                    playButton.isEnabled = false
-                }
+                PlayerViewModel.STATE_DEFAULT -> playButton.isEnabled = false
             }
         })
 
-        viewModel.observeProgressTime().observe(viewLifecycleOwner, Observer { progressTime ->
+        viewModel.observeProgressTime().observe(viewLifecycleOwner) { progressTime ->
             time.text = progressTime
-        })
+        }
 
-        viewModel.observeTrack().observe(viewLifecycleOwner, Observer { track ->
+        viewModel.observeTrack().observe(viewLifecycleOwner) { track ->
             updateUI(track)
-        })
+        }
+
+
+        viewModel.observeIsFavorite().observe(viewLifecycleOwner) { isFavorite ->
+            favoriteButton.setImageResource(
+                if (isFavorite) R.drawable.favnight
+                else R.drawable.favbutton
+            )
+        }
     }
 
     private fun setupClickListeners() {
         back.setOnClickListener {
-
             findNavController().navigateUp()
         }
 
         playButton.setOnClickListener {
             viewModel.onPlayButtonClicked()
+        }
+
+
+        favoriteButton.setOnClickListener {
+            viewModel.onFavoriteClicked()
         }
     }
 
@@ -150,7 +158,6 @@ class PlayerFragment : Fragment() {
         type.text = track.primaryGenreName
         country.text = track.country
 
-        // Загрузка изображения с Glide
         Glide.with(this)
             .load(track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
             .placeholder(R.drawable.placeholdersvg)
@@ -159,13 +166,12 @@ class PlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.observePlayerState().value == PlayerViewModel.Companion.STATE_PLAYING) {
+        if (viewModel.observePlayerState().value == PlayerViewModel.STATE_PLAYING) {
             viewModel.onPlayButtonClicked()
         }
     }
 
     companion object {
-
         fun createArgs(track: Track, gson: Gson): Bundle {
             val args = Bundle()
             val trackJson = gson.toJson(track)

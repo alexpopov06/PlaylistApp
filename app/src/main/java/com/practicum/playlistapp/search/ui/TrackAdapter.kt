@@ -20,15 +20,16 @@ import java.util.Locale
 
 class TrackAdapter(
     var tracks: List<Track>,
-    private val addToHistoryUseCase: AddToHistoryUseCase,
+    private val addToHistoryUseCase: AddToHistoryUseCase? = null,
     private val delayDebounce: () -> Boolean,
     private val gson: Gson,
     private val onTrackClick: (Track) -> Unit
-): RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        Log.d("TrackAdapter", "onCreateViewHolder called")
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.track_item, parent, false)
+
         return TrackViewHolder(
             view,
             addToHistoryUseCase,
@@ -39,76 +40,56 @@ class TrackAdapter(
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        Log.d("TrackAdapter", "onBindViewHolder position: $position, track: ${tracks[position].trackName}")
         holder.bind(tracks[position])
     }
 
-    override fun getItemCount(): Int {
-        Log.d("TrackAdapter", "getItemCount: ${tracks.size}")
-        return tracks.size
-    }
+    override fun getItemCount() = tracks.size
 
     fun updateTracks(newTracks: List<Track>) {
-        Log.d("TrackAdapter", "updateTracks: ${newTracks.size} tracks")
         tracks = newTracks
         notifyDataSetChanged()
     }
 
     class TrackViewHolder(
         itemView: View,
-        private val addToHistoryUseCase: AddToHistoryUseCase,
+        private val addToHistoryUseCase: AddToHistoryUseCase?,
         private val delayDebounce: () -> Boolean,
         private val gson: Gson,
         private val onTrackClick: (Track) -> Unit
-    ): RecyclerView.ViewHolder(itemView) {
+    ) : RecyclerView.ViewHolder(itemView) {
 
         private val imageTrack: ImageView = itemView.findViewById(R.id.imageTrack)
         private val trackName: TextView = itemView.findViewById(R.id.nameTrack)
         private val groupName: TextView = itemView.findViewById(R.id.nameGroup)
         private val trackTime: TextView = itemView.findViewById(R.id.trackTime)
-        private val timeTrack = SimpleDateFormat("mm:ss", Locale.getDefault())
+        private val timeFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
 
         fun bind(item: Track) {
-            Log.d("TrackAdapter", "Binding track: ${item.trackName}")
-
             trackName.text = item.trackName
             groupName.text = item.artistName
-            val milliseconds = item.trackTimeMillis.toLong()
-            trackTime.text = timeTrack.format(Date(milliseconds))
 
-            Glide.with(itemView).load(item.artworkUrl100)
-                .centerCrop().transform(RoundedCorners(10))
+            trackTime.text = timeFormat.format(Date(item.trackTimeMillis))
+
+            Glide.with(itemView)
+                .load(item.artworkUrl100)
+                .transform(RoundedCorners(10))
                 .placeholder(R.drawable.image_track)
                 .into(imageTrack)
 
             itemView.setOnClickListener {
-                Log.d("TrackAdapter", "CLICK DETECTED on track: ${item.trackName}")
                 try {
-                    val debounceResult = delayDebounce()
-                    Log.d("TrackAdapter", "Debounce result: $debounceResult")
+                    if (delayDebounce()) {
 
-                    if (debounceResult) {
-                        Log.d("TrackAdapter", "Executing click logic")
-                        addToHistoryUseCase.execute(item)
-                        Log.d("TrackAdapter", "Calling onTrackClick callback")
+
+                        addToHistoryUseCase?.execute(item)
+
                         onTrackClick(item)
-                    } else {
-                        Log.d("TrackAdapter", "Click blocked by debounce")
                     }
                 } catch (e: Exception) {
-                    Log.e("TrackAdapter", "Error in click handler", e)
                     Toast.makeText(itemView.context, "Ошибка открытия трека", Toast.LENGTH_SHORT).show()
+                    Log.e("TrackAdapter", "Error: ${e.message}")
                 }
             }
-
-
-            itemView.isClickable = true
-            itemView.isFocusable = true
-            Log.d("TrackAdapter", "View clickable: ${itemView.isClickable}, focusable: ${itemView.isFocusable}")
         }
-    }
-
-    companion object {
-        private const val TAG = "TrackAdapter"
     }
 }

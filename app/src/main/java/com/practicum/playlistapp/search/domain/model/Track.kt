@@ -11,7 +11,8 @@ data class Track(
     val primaryGenreName: String?,
     val country: String?,
     val previewUrl: String,
-    val formattedDuration: String = formatMillisToMmSs(trackTimeMillis)
+    val formattedDuration: String = formatMillisToMmSs(trackTimeMillis),
+    var isFavorite: Boolean = false
 ) {
     companion object {
         fun formatMillisToMmSs(millis: Long): String {
