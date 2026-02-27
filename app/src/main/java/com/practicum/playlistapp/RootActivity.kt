@@ -34,7 +34,7 @@ class RootActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.playerFragment) hideBottomNav()
+            if (destination.id == R.id.playerFragment || destination.id == R.id.createPlaylistFragment) hideBottomNav()
             else if (!isKeyboardVisible) showBottomNav()
         }
     }
