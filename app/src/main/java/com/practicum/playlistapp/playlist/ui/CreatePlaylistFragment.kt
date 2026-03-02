@@ -11,6 +11,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -135,6 +138,7 @@ class CreatePlaylistFragment : Fragment() {
         super.onSaveInstanceState(outState)
         outState.putString("cover_uri", coverUri?.toString())
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
