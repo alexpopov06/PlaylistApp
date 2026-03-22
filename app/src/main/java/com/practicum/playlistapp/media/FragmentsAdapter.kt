@@ -13,7 +13,7 @@ class FragmentsAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapte
 
     override fun createFragment(position: Int): Fragment = when (position) {
         0 -> FavoritesFragment()
-        else -> SecondFragment.newInstance()
+        else -> SecondFragment()
 
     }
 }

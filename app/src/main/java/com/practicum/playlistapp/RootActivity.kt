@@ -34,7 +34,7 @@ class RootActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.playerFragment) hideBottomNav()
+            if (destination.id == R.id.playerFragment || destination.id == R.id.createPlaylistFragment) hideBottomNav()
             else if (!isKeyboardVisible) showBottomNav()
         }
     }
@@ -42,14 +42,24 @@ class RootActivity : AppCompatActivity() {
     private fun setupKeyboardListener() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
 
-            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val imeVisible = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom > 0
+            isKeyboardVisible = imeVisible
 
-            val keyboardNowVisible = imeHeight > 0
+            val navController =
+                (supportFragmentManager.findFragmentById(R.id.rootFragmentContainerView)
+                        as NavHostFragment).navController
 
-            if (keyboardNowVisible != isKeyboardVisible) {
-                isKeyboardVisible = keyboardNowVisible
-                if (keyboardNowVisible) hideBottomNav()
-                else showBottomNav()
+            val destinationId = navController.currentDestination?.id
+
+            if (imeVisible) {
+                hideBottomNav()
+            } else {
+
+                if (destinationId != R.id.playerFragment &&
+                    destinationId != R.id.createPlaylistFragment
+                ) {
+                    showBottomNav()
+                }
             }
 
             insets

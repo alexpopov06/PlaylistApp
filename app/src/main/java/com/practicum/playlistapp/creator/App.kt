@@ -2,6 +2,7 @@ package com.practicum.playlistapp
 
 import android.app.Application
 import com.practicum.playlistapp.media.mediaModule
+import com.practicum.playlistapp.playlist.di.playlistModule
 import com.practicum.playlistapp.player.di.playerModule
 import com.practicum.playlistapp.search.di.searchModule
 import com.practicum.playlistapp.settings.di.settingsModule
@@ -17,7 +18,7 @@ class App : Application() {
         super.onCreate()
         startKoin{
             androidContext(this@App)
-            modules(settingsModule, sharingModule, playerModule, searchModule, mediaModule)
+            modules(settingsModule, sharingModule, playerModule, searchModule, mediaModule, playlistModule)
         }
         val themeRepository = getKoin().get<ThemeRepository>()
         themeRepository.applyTheme(themeRepository.getCurrentTheme())
