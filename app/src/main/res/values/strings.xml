@@ -18,4 +18,23 @@
     <string name="trackLink3">https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg</string>
     <string name="trackLink4">https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg</string>
     <string name="trackLink5">https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg </string>
+
+    <string name="playlist_share_no_tracks">В данном плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="playlist_menu_share">Поделиться</string>
+    <string name="playlist_menu_edit_info">Редактировать информацию</string>
+    <string name="playlist_menu_delete_playlist">Удалить плейлист</string>
+    <string name="playlist_delete_playlist_title">Удалить плейлист</string>
+    <string name="playlist_delete_playlist_message">Вы уверены, что хотите удалить этот плейлист?</string>
+    <string name="playlist_delete_dialog_no">Отмена</string>
+    <string name="playlist_delete_dialog_yes">Удалить</string>
+    <string name="playlist_share_chooser">Поделиться</string>
+
+    <string name="playlist_track_delete_message">Хотите удалить трек?</string>
+    <string name="playlist_track_delete_no">НЕТ</string>
+    <string name="playlist_track_delete_yes">ДА</string>
+
+    <string name="playlist_edit_title">Редактировать</string>
+    <string name="playlist_save">Сохранить</string>
+
+    <string name="playlist_empty_tracks">В этом плейлисте нет треков</string>
 </resources>

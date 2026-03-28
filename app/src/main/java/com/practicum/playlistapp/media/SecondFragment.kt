@@ -1,6 +1,5 @@
 package com.practicum.playlistapp.media
 
-import android.content.res.Resources
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,13 +11,23 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistapp.R
 import com.practicum.playlistapp.databinding.FragmentSecondBinding
+import com.practicum.playlistapp.playlist.ui.PlaylistInfoFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SecondFragment : Fragment() {
 
     private lateinit var binding: FragmentSecondBinding
     private val viewModel: SecondFragmentViewModel by viewModel()
-    private val adapter = PlaylistAdapter(emptyList())
+    private val adapter = PlaylistAdapter(emptyList()) { playlist ->
+        val bundle = Bundle().apply {
+            putLong(PlaylistInfoFragment.ARG_PLAYLIST_ID, playlist.id)
+        }
+
+        findNavController().navigate(
+            R.id.action_mediaFragment_to_playlistInfoFragment,
+            bundle
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
