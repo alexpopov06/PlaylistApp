@@ -23,7 +23,8 @@ class TrackAdapter(
     private val addToHistoryUseCase: AddToHistoryUseCase? = null,
     private val delayDebounce: () -> Boolean,
     private val gson: Gson,
-    private val onTrackClick: (Track) -> Unit
+    private val onTrackClick: (Track) -> Unit,
+    private val onTrackLongClick: ((Track) -> Unit)? = null
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -35,7 +36,8 @@ class TrackAdapter(
             addToHistoryUseCase,
             delayDebounce,
             gson,
-            onTrackClick
+            onTrackClick,
+            onTrackLongClick
         )
     }
 
@@ -55,7 +57,8 @@ class TrackAdapter(
         private val addToHistoryUseCase: AddToHistoryUseCase?,
         private val delayDebounce: () -> Boolean,
         private val gson: Gson,
-        private val onTrackClick: (Track) -> Unit
+        private val onTrackClick: (Track) -> Unit,
+        private val onTrackLongClick: ((Track) -> Unit)?
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val imageTrack: ImageView = itemView.findViewById(R.id.imageTrack)
@@ -70,10 +73,12 @@ class TrackAdapter(
 
             trackTime.text = timeFormat.format(Date(item.trackTimeMillis))
 
+            val artUrl = item.artworkUrl100.takeIf { it.isNotBlank() }
             Glide.with(itemView)
-                .load(item.artworkUrl100)
+                .load(artUrl)
                 .transform(RoundedCorners(10))
-                .placeholder(R.drawable.image_track)
+                .placeholder(R.drawable.placeholdersvg)
+                .error(R.drawable.placeholdersvg)
                 .into(imageTrack)
 
             itemView.setOnClickListener {
@@ -90,6 +95,15 @@ class TrackAdapter(
                     Log.e("TrackAdapter", "Error: ${e.message}")
                 }
             }
+
+            itemView.setOnLongClickListener(
+                onTrackLongClick?.let { longClick ->
+                    View.OnLongClickListener {
+                        longClick(item)
+                        true
+                    }
+                }
+            )
         }
     }
 }

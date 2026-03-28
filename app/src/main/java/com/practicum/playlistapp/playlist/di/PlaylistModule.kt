@@ -5,6 +5,8 @@ import com.practicum.playlistapp.playlist.domain.api.PlaylistsInteractor
 import com.practicum.playlistapp.playlist.domain.impl.PlaylistsInteractorImpl
 import com.practicum.playlistapp.playlist.domain.repository.PlaylistsRepository
 import com.practicum.playlistapp.playlist.presentation.CreatePlaylistViewModel
+import com.practicum.playlistapp.playlist.presentation.EditPlaylistViewModel
+import com.practicum.playlistapp.playlist.presentation.PlaylistInfoViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -19,5 +21,7 @@ val playlistModule = module {
     }
     single<PlaylistsInteractor> { PlaylistsInteractorImpl(get()) }
     viewModel { CreatePlaylistViewModel(get()) }
+    viewModel { (playlistId: Long) -> PlaylistInfoViewModel(playlistId, get()) }
+    viewModel { (playlistId: Long) -> EditPlaylistViewModel(get(), playlistId) }
 }
 

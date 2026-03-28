@@ -12,12 +12,13 @@ import com.practicum.playlistapp.playlist.domain.model.Playlist
 import java.io.File
 
 class PlaylistAdapter(
-    private var playlists: List<Playlist>
+    private var playlists: List<Playlist>,
+    private val onPlaylistClick: (Playlist) -> Unit = {}
 ) : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_playlist, parent, false)
-        return PlaylistViewHolder(view)
+        return PlaylistViewHolder(view, onPlaylistClick)
     }
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
@@ -31,7 +32,10 @@ class PlaylistAdapter(
         notifyDataSetChanged()
     }
 
-    class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class PlaylistViewHolder(
+        itemView: View,
+        private val onPlaylistClick: (Playlist) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
         private val cover: ImageView = itemView.findViewById(R.id.cover)
         private val name: TextView = itemView.findViewById(R.id.name)
         private val count: TextView = itemView.findViewById(R.id.count)
@@ -48,6 +52,8 @@ class PlaylistAdapter(
                 .placeholder(R.drawable.placeholdersvg)
                 .error(R.drawable.placeholdersvg)
                 .into(cover)
+
+            itemView.setOnClickListener { onPlaylistClick(playlist) }
         }
 
         private fun formatCount(trackCount: Int): String {

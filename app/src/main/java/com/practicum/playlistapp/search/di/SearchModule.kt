@@ -1,4 +1,3 @@
-// SearchModule.kt
 package com.practicum.playlistapp.search.di
 
 import android.content.Context

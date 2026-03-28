@@ -13,6 +13,7 @@ import com.practicum.playlistapp.search.data.db.PlaylistEntity
 import com.practicum.playlistapp.search.domain.model.Track
 import java.io.File
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class PlaylistsRepositoryImpl(
@@ -44,6 +45,26 @@ class PlaylistsRepositoryImpl(
         dao.updatePlaylist(playlist.toEntity(gson))
     }
 
+    override suspend fun updatePlaylistDetails(
+        playlistId: Long,
+        name: String,
+        description: String?,
+        coverUri: Uri?
+    ) {
+        val entity = dao.getPlaylistEntityById(playlistId) ?: return
+        val playlist = entity.toDomain(gson)
+        val safeName = name.trim()
+        val safeDescription = description?.trim()?.takeIf { it.isNotBlank() }
+        val coverPath = coverUri?.let { copyCoverToPrivateStorage(it) } ?: playlist.coverPath
+        dao.updatePlaylist(
+            playlist.copy(
+                name = safeName,
+                description = safeDescription,
+                coverPath = coverPath
+            ).toEntity(gson)
+        )
+    }
+
     override fun getPlaylists(): Flow<List<Playlist>> {
         return dao.getPlaylists().map { list ->
             list.map { it.toDomain(gson) }
@@ -61,6 +82,45 @@ class PlaylistsRepositoryImpl(
             trackCount = playlist.trackCount + 1
         )
         dao.updatePlaylist(updated.toEntity(gson))
+    }
+
+    override fun getPlaylistById(id: Long): Flow<Playlist?> {
+        return dao.getPlaylistById(id).map { entity -> entity?.toDomain(gson) }
+    }
+
+    override fun getTracksForPlaylistTrackIds(trackIds: List<String>): Flow<List<Track>> {
+        if (trackIds.isEmpty()) return flowOf(emptyList())
+        return trackDao.getAllTracks().map { all ->
+            val byId = all.associateBy { it.id }
+            trackIds.asReversed().mapNotNull { tid -> byId[tid]?.toDomainTrack() }
+        }
+    }
+
+    override suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: String) {
+        if (trackId.isBlank()) return
+        val entity = dao.getPlaylistEntityById(playlistId) ?: return
+        val playlist = entity.toDomain(gson)
+        if (trackId !in playlist.trackIds) return
+        val newIds = playlist.trackIds.filter { it != trackId }
+        dao.updatePlaylist(
+            playlist.copy(trackIds = newIds, trackCount = newIds.size).toEntity(gson)
+        )
+        removeOrphanPlaylistTrackIfNeeded(trackId)
+    }
+
+    private suspend fun removeOrphanPlaylistTrackIfNeeded(trackId: String) {
+        val playlists = dao.getAllPlaylistsOnce()
+        for (p in playlists) {
+            if (trackId in p.toDomain(gson).trackIds) return
+        }
+        trackDao.deleteTrackById(trackId)
+    }
+
+    override suspend fun deletePlaylist(playlistId: Long) {
+        val entity = dao.getPlaylistEntityById(playlistId) ?: return
+        val trackIds = entity.toDomain(gson).trackIds
+        dao.deletePlaylistById(playlistId)
+        trackIds.forEach { removeOrphanPlaylistTrackIfNeeded(it) }
     }
 
     private fun copyCoverToPrivateStorage(uri: Uri): String? {
@@ -127,6 +187,21 @@ private fun Track.toPlaylistTrackEntity(): PlaylistTrackEntity {
         country = this.country,
         previewUrl = this.previewUrl,
         addedAt = System.currentTimeMillis()
+    )
+}
+
+private fun PlaylistTrackEntity.toDomainTrack(): Track {
+    return Track(
+        trackName = trackName,
+        artistName = artistName,
+        trackTimeMillis = trackTimeMillis,
+        artworkUrl100 = artworkUrl100.orEmpty(),
+        trackId = trackId,
+        collectionName = collectionName,
+        releaseDate = releaseDate,
+        primaryGenreName = primaryGenreName,
+        country = country,
+        previewUrl = previewUrl.orEmpty()
     )
 }
 
