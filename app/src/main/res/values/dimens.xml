@@ -10,5 +10,6 @@
     <dimen name="s22">22dp</dimen>
     <dimen name="s14">14dp</dimen>
     <dimen name="s45">45dp</dimen>
+    <dimen name="playlist_header_height">100dp</dimen>
     <dimen name="playlist_tracks_bottom_sheet_peek">300dp</dimen>
 </resources>

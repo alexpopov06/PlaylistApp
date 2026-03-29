@@ -10,7 +10,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/playlistHeader"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/playlist_tracks_bottom_sheet_peek">
 
         <ImageButton
             android:id="@+id/backButton"
@@ -29,6 +30,8 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             android:background="@drawable/bg_cover_round_8"
             android:clipToOutline="true"
             android:scaleType="centerCrop"
