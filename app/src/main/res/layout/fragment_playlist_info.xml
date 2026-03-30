@@ -121,7 +121,7 @@
         android:elevation="8dp"
         android:orientation="vertical"
         app:behavior_draggable="true"
-        app:behavior_fitToContents="false"
+        app:behavior_fitToContents="true"
         app:behavior_hideable="false"
         app:behavior_peekHeight="@dimen/playlist_tracks_bottom_sheet_peek"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">

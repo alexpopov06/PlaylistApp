@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -51,13 +50,6 @@ class PlaylistInfoFragment : Fragment() {
     private lateinit var tracksAdapter: TrackAdapter
 
     private var optionsBottomSheetDialog: BottomSheetDialog? = null
-
-    private var tracksBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
-
-    private val playlistHeaderLayoutListener =
-        View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            applyTracksSheetExpandedOffsetIfReady()
-        }
 
     private var currentPlaylist: Playlist? = null
     private var currentTracks: List<Track> = emptyList()
@@ -267,46 +259,13 @@ class PlaylistInfoFragment : Fragment() {
     }
 
     private fun setupTracksBottomSheet() {
-        val behavior = BottomSheetBehavior.from(binding.bottomSheet)
-        val peekPx = resources.getDimensionPixelSize(R.dimen.playlist_tracks_bottom_sheet_peek)
-
-        behavior.isHideable = false
-        behavior.isFitToContents = false
-        behavior.peekHeight = peekPx
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-        binding.root.doOnLayout { applyTracksSheetExpandedOffsetIfReady() }
-        binding.playlistHeader.addOnLayoutChangeListener(playlistHeaderLayoutListener)
-
-        val callback = object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                val b = _binding ?: return
-                val currentBehavior = BottomSheetBehavior.from(b.bottomSheet)
-                if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
-                    currentBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    return
-                }
-                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    currentBehavior.peekHeight = peekPx
-                }
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
+        BottomSheetBehavior.from(binding.bottomSheet).apply {
+            isHideable = false
+            isFitToContents = true
+            peekHeight =
+                resources.getDimensionPixelSize(R.dimen.playlist_tracks_bottom_sheet_peek)
+            state = BottomSheetBehavior.STATE_COLLAPSED
         }
-        tracksBottomSheetCallback = callback
-        behavior.addBottomSheetCallback(callback)
-    }
-
-    /** Top edge of the sheet in EXPANDED stays at or below the action buttons — not full screen. */
-    private fun applyTracksSheetExpandedOffsetIfReady() {
-        val b = _binding ?: return
-        if (!b.actionsRow.isLaidOut || b.playlistHeader.height == 0) return
-
-        val behavior = BottomSheetBehavior.from(b.bottomSheet)
-        val margin = resources.getDimensionPixelSize(R.dimen.s8)
-        val topLimit = b.playlistHeader.top + b.actionsRow.bottom + margin
-        val maxTop = (b.root.height - 1).coerceAtLeast(0)
-        behavior.expandedOffset = topLimit.coerceIn(0, maxTop)
     }
 
     private fun renderCover(coverPath: String?) {
@@ -341,13 +300,6 @@ class PlaylistInfoFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        _binding?.let { b ->
-            tracksBottomSheetCallback?.let { cb ->
-                BottomSheetBehavior.from(b.bottomSheet).removeBottomSheetCallback(cb)
-            }
-            b.playlistHeader.removeOnLayoutChangeListener(playlistHeaderLayoutListener)
-        }
-        tracksBottomSheetCallback = null
         optionsBottomSheetDialog?.dismiss()
         optionsBottomSheetDialog = null
         super.onDestroyView()
