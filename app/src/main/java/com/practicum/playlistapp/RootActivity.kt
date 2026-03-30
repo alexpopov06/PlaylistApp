@@ -34,8 +34,15 @@ class RootActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.playerFragment || destination.id == R.id.createPlaylistFragment) hideBottomNav()
-            else if (!isKeyboardVisible) showBottomNav()
+            if (destination.id == R.id.playerFragment ||
+                destination.id == R.id.createPlaylistFragment ||
+                destination.id == R.id.editPlaylistFragment ||
+                destination.id == R.id.playlistInfoFragment
+            ) {
+                hideBottomNav()
+            } else if (!isKeyboardVisible) {
+                showBottomNav()
+            }
         }
     }
 
@@ -56,7 +63,9 @@ class RootActivity : AppCompatActivity() {
             } else {
 
                 if (destinationId != R.id.playerFragment &&
-                    destinationId != R.id.createPlaylistFragment
+                    destinationId != R.id.createPlaylistFragment &&
+                    destinationId != R.id.editPlaylistFragment &&
+                    destinationId != R.id.playlistInfoFragment
                 ) {
                     showBottomNav()
                 }

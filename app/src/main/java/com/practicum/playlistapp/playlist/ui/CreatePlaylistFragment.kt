@@ -11,9 +11,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -22,15 +19,15 @@ import com.practicum.playlistapp.databinding.FragmentCreatePlaylistBinding
 import com.practicum.playlistapp.playlist.presentation.CreatePlaylistViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFragment : Fragment() {
+open class CreatePlaylistFragment : Fragment() {
 
-    private var _binding: FragmentCreatePlaylistBinding? = null
-    private val binding get() = _binding!!
+    protected var _binding: FragmentCreatePlaylistBinding? = null
+    protected val binding get() = _binding!!
 
     private var coverUri: Uri? = null
-    private var isCreated = false
+    private var isFinished = false
 
-    private val viewModel: CreatePlaylistViewModel by viewModel()
+    protected open val formViewModel: CreatePlaylistViewModel by viewModel()
 
     private val pickCover =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -78,14 +75,22 @@ class CreatePlaylistFragment : Fragment() {
         binding.createButton.setOnClickListener {
             val name = binding.titleEditText.text?.toString().orEmpty()
             val description = binding.descriptionEditText.text?.toString()
-            viewModel.createPlaylist(name, description, coverUri)
+            onSubmit(name, description, coverUri)
         }
 
-        viewModel.observeCreated().observe(viewLifecycleOwner) { name ->
-            isCreated = true
-            Toast.makeText(requireContext(), "Плейлист $name создан", Toast.LENGTH_LONG).show()
-            findNavController().navigateUp()
+        formViewModel.observeFinished().observe(viewLifecycleOwner) { name ->
+            isFinished = true
+            onFormFinished(name)
         }
+    }
+
+    protected open fun onSubmit(name: String, description: String?, coverUri: Uri?) {
+        formViewModel.createPlaylist(name, description, coverUri)
+    }
+
+    protected open fun onFormFinished(name: String) {
+        Toast.makeText(requireContext(), "Плейлист $name создан", Toast.LENGTH_LONG).show()
+        findNavController().navigateUp()
     }
 
     private val backCallback = object : OnBackPressedCallback(true) {
@@ -103,7 +108,7 @@ class CreatePlaylistFragment : Fragment() {
         override fun afterTextChanged(s: Editable?) {}
     }
 
-    private fun renderCover(uri: Uri) {
+    protected fun renderCover(uri: Uri) {
         binding.coverImage.visibility = View.VISIBLE
         binding.addCoverIcon.visibility = View.GONE
 
@@ -113,8 +118,8 @@ class CreatePlaylistFragment : Fragment() {
             .into(binding.coverImage)
     }
 
-    private fun handleClose() {
-        if (!isCreated && hasUnsavedChanges()) {
+    protected open fun handleClose() {
+        if (!isFinished && shouldConfirmDiscard() && hasUnsavedChanges()) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Завершить создание плейлиста?")
                 .setMessage("Все несохраненные данные будут потеряны")
@@ -128,7 +133,9 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun hasUnsavedChanges(): Boolean {
+    protected open fun shouldConfirmDiscard(): Boolean = true
+
+    protected open fun hasUnsavedChanges(): Boolean {
         return coverUri != null ||
             !binding.titleEditText.text.isNullOrBlank() ||
             !binding.descriptionEditText.text.isNullOrBlank()
@@ -139,10 +146,8 @@ class CreatePlaylistFragment : Fragment() {
         outState.putString("cover_uri", coverUri?.toString())
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
-

@@ -8,18 +8,17 @@ import androidx.lifecycle.viewModelScope
 import com.practicum.playlistapp.playlist.domain.api.PlaylistsInteractor
 import kotlinx.coroutines.launch
 
-class CreatePlaylistViewModel(
-    private val playlistsInteractor: PlaylistsInteractor
+open class CreatePlaylistViewModel(
+    protected val playlistsInteractor: PlaylistsInteractor
 ) : ViewModel() {
 
-    private val createdLiveData = MutableLiveData<String>()
-    fun observeCreated(): LiveData<String> = createdLiveData
+    protected val finishedLiveData = MutableLiveData<String>()
+    fun observeFinished(): LiveData<String> = finishedLiveData
 
-    fun createPlaylist(name: String, description: String?, coverUri: Uri?) {
+    open fun createPlaylist(name: String, description: String?, coverUri: Uri?) {
         viewModelScope.launch {
             playlistsInteractor.createPlaylist(name, description, coverUri)
-            createdLiveData.postValue(name)
+            finishedLiveData.postValue(name.trim())
         }
     }
 }
-
